@@ -42,7 +42,7 @@
             "evaluator": "HHGCLEvaluator"
         },
         "JCLRNT": {
-            "dataset_class": "JCLRNTDataset",
+            "dataset_class": "JCLRNTABLDataset",
             "executor": "LineSeqExecutor",
             "evaluator": "LineSeqEvaluator"
         },

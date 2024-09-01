@@ -6,6 +6,10 @@ from veccity.evaluator.downstream_models.abstract_model import AbstractModel
 from sklearn import linear_model
 from sklearn.model_selection import KFold
 from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
+from veccity.data.dataset.dataset_subclass.bert_vocab import WordVocab
+from veccity.data.preprocess import cache_dir
+import os
+import random
 
 
 class SpeedInferenceModel(AbstractModel):
@@ -16,37 +20,46 @@ class SpeedInferenceModel(AbstractModel):
         self.exp_id = config.get('exp_id', None)
         self.result_path = './veccity/cache/{}/evaluate_cache/regression_{}_{}.npy'. \
             format(self.exp_id, self.alpha, self.n_split)
+        self.dataset = config.get('dataset', '')
+        self.data_path = './raw_data/' + self.dataset + '/'
+        data_cache_dir = os.path.join(cache_dir, self.dataset)
+        self.min_freq=config.get('min_freq',1)
+        self.vocab_path = data_cache_dir+'/vocab_{}_True_{}.pkl'.format(self.dataset, self.min_freq)
+        self.vocab = WordVocab.load_vocab(self.vocab_path)
+        self.choice=config.get('choice',0)
 
-    def run(self, model, label):
+    def run(self, x, label):
         self._logger.info("-------- Speed Inference --------")
-        x=model.get_static_embedding()
-
-        vocab=model.vocab
-
-        # change the y same to the x
-        y = np.array(label['speed']['speed']) #shape=5269
-        index=np.array(label['speed']['index'])
-        index_x=[]
-        index_y=[]
-        for i in range(index.shape[0]):
-            geo_id=index[i]
-            if geo_id in vocab.loc2index:
-                index_y.append(i)
-                index_x.append(vocab.loc2index[geo_id])
-        
-                
-        x=x[index_x]
-        y=y[index_y]
-        
+        x_ = []
+        index = label['speed']['index']
+        for i in index:
+            x_.append(x[int(i)])
+        x = np.array(x_)
+        y = np.array(label['speed']['speed'])
+        choice=self.choice
         kf = KFold(n_splits=self.n_split)
         y_preds = []
         y_truths = []
 
-        for train_index, test_index in kf.split(x):
+        for i,(train_index, test_index) in enumerate(kf.split(x)):
             train_index = list(train_index)
             test_index = list(test_index)
             X_train, X_test = x[train_index], x[test_index]
             y_train, y_test = y[train_index], y[test_index]
+
+            if choice <100:
+                cur_lens=len(X_train)
+                k=int(cur_lens*choice/100)
+                index_range=list(range(cur_lens))
+                select_index=random.choices(index_range,k=k)
+                X_train=X_train[select_index]
+                y_train=y_train[select_index]
+                if i==0:
+                    print(f"do choice with {choice}%")
+                    print(f"befor is {cur_lens}")
+                    after=len(X_train)
+                    print(f"after is {after}")
+
             reg = linear_model.Ridge(alpha=self.alpha)
             X_train = np.array(X_train, dtype=float)
             y_train = np.array(y_train, dtype=float)

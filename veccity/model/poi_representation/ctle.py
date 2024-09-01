@@ -84,7 +84,7 @@ class CTLE(AbstractModel):
         num_layers = config.get('num_layers', 4)
         num_heads = config.get('cnum_heads', 8)
         detach = config.get('detach', False)
-        ctle_objective = config.get('objective', 'mh')
+        ctle_objective = 'mlm'#config.get('objective', 'mlm')
         embed_size = config.get('embed_size', 128)
         init_param = config.get('init_param', False)
         hidden_size = embed_size * 4

@@ -3,9 +3,13 @@ import pandas as pd
 import numpy as np
 import torch
 import scipy.sparse as sp
+import random
 
 from veccity.data.dataset.dataset_subclass import MVUREDataset
 from veccity.utils import need_train
+from veccity.data.preprocess import preprocess_all, cache_dir
+from veccity.data.utils import split_list
+
 
 
 # Heterogeneous Region Embedding with Prompt Learning
@@ -32,6 +36,27 @@ class HREPDataset(MVUREDataset):
         self.device = config.get('device')
         self.embedding_size = config.get("output_dim", 144)
         self.importance_k = config.get("importance_k", 10)
+        self.od_label_path = os.path.join(cache_dir, self.dataset, 'od_region_train_od.npy')
+        self.od_label = np.load(self.od_label_path)
+        self.construct_trip_data()
+    
+    def construct_trip_data(self):
+        # 根据od 6：2：2将数据分成训练集，测试集和验证集（org,dst,vol)
+        total_trip = [[i, j, self.od_label[i][j]] for i in range(self.num_regions) for j in range(self.num_regions)]
+        random.shuffle(total_trip)
+        split_ratio = [0.6, 0.2, 0.2]
+        result = split_list(total_trip, split_ratio, 3)
+        self.train_trip = np.array(result[0])
+        self.test_trip = np.array(result[1])
+        self.valid_trip = np.array(result[2])
+        self.train_inflow = np.zeros(self.num_regions)
+        self.train_outflow = np.zeros(self.num_regions)
+        for i in range(self.train_trip.shape[0]):
+            org = self.train_trip[i][0]
+            dst = self.train_trip[i][1]
+            vol = self.train_trip[i][2]
+            self.train_inflow[int(dst)] += vol
+            self.train_outflow[int(org)] += vol
 
     def graph_to_COO(self, similarity, importance_k):
         graph = torch.eye(self.num_regions)
@@ -94,5 +119,7 @@ class HREPDataset(MVUREDataset):
             'poi_similarity': self.poi_similarity,
             'mobility': self.mobility,
             'neighbor': self.neighbor,
-            'num_regions': self.num_regions
+            'num_regions': self.num_regions,
+            'inflow_labels':self.train_inflow,
+            'outflow_labels':self.train_outflow
         }

@@ -11,6 +11,7 @@ from veccity.model.poi_representation.static import StaticEmbed, DownstreamEmbed
 from sklearn.metrics import normalized_mutual_info_score
 from veccity.model.poi_representation.utils import next_batch
 import copy
+import random
 
 
 
@@ -32,6 +33,7 @@ class POIRepresentationEvaluator(AbstractEvaluator):
         self.embed_layer = self.data_feature.get('embed_layer')
         self.task_epoch = self.config.get('task_epoch', 5)
         self.batch_size = self.config.get('downstream_batch_size', 32)
+        self.choice=self.config.get('choice',0)
 
     def collect(self, batch):
         pass
@@ -39,6 +41,11 @@ class POIRepresentationEvaluator(AbstractEvaluator):
     def evaluate_loc_pre(self):
         st_aux_embed_size = self.config.get('st_aux_embed_size', 32)
         train_set = self.data_feature.get('train_set')
+        choice=self.config.get('choice',0)
+        if choice:
+            train_set=random.choices(train_set,k=choice)
+            self._logger.info(f'select train size {choice} in lp')
+
         test_set = self.data_feature.get('test_set')
         embed_layer=copy.deepcopy(self.embed_layer)       
             
@@ -52,6 +59,11 @@ class POIRepresentationEvaluator(AbstractEvaluator):
         train_set = self.data_feature.get('train_set')
         test_set = self.data_feature.get('test_set')
         embed_layer = copy.deepcopy(self.embed_layer)
+
+        choice=self.config.get('choice',0)
+        if choice:
+            train_set=random.choices(train_set,k=choice)
+            self._logger.info(f'select train size {choice} in tul')
 
         self.result['traj_clf_acc1'],self.result['traj_clf_acc5'], self.result['traj_clf_f1_macro'] =\
         trajectory_based_classification(train_set, test_set, num_class=num_user,embed_layer=embed_layer,embed_size=self.embed_size,hidden_size=self.hidden_size,
@@ -82,10 +94,21 @@ class POIRepresentationEvaluator(AbstractEvaluator):
         labels=category.category.to_numpy()
         
         num_class = labels.max()+1
-        
+        choice=self.choice
         skf=StratifiedKFold(n_splits=5,shuffle=True,random_state=seed)
         score_log = []
         for i,(train_ind,valid_ind) in enumerate(skf.split(inputs,labels)):
+            if choice <100:
+                cur_lens=len(train_ind)
+                k=int(cur_lens*choice/100)
+                index_range=list(range(cur_lens))
+                select_index=random.choices(index_range,k=k)
+                train_ind=train_ind[select_index]
+                if i==0:
+                    print(f"do choice with {choice}%")
+                    print(f"befor is {cur_lens}")
+                    after=len(train_ind)
+                    print(f"after is {after}")
             clf_model = FCClassifier(copy.deepcopy(embed_layer),embed_size,num_class,hidden_size=128).to(device)
             optimizer = torch.optim.Adam(clf_model.parameters(), lr=1e-4)
             loss_func = nn.CrossEntropyLoss()
@@ -176,14 +199,14 @@ class POIRepresentationEvaluator(AbstractEvaluator):
 
     def evaluate(self):
         self._logger.info('Start evaluating ...')
-        self.evaluate_loc_pre()
-        self.evaluate_traj_clf()
+        # self.evaluate_loc_pre()
+        # self.evaluate_traj_clf()
         poi_type_name = self.config.get('poi_type_name', None)
         if poi_type_name is not None:
             self.evaluate_loc_clf()
             # self.evaluate_loc_cluster()
-        result_path = './veccity/cache/{}/evaluate_cache/{}_evaluate_{}_{}_{}.json'. \
-            format(self.exp_id, self.exp_id, self.model, self.dataset, str(self.embed_size))
+        result_path = './veccity/cache/{}/evaluate_cache/{}_evaluate_{}_{}_{}_{}.json'. \
+            format(self.exp_id, self.exp_id, self.model, self.dataset, str(self.embed_size),str(self.choice))
         self._logger.info(self.result)
 
         def dict_to_csv(dictionary, filename):
@@ -191,8 +214,8 @@ class POIRepresentationEvaluator(AbstractEvaluator):
                 writer = csv.DictWriter(csvfile, fieldnames=dictionary.keys())
                 writer.writeheader()
                 writer.writerow(dictionary)
-        result_path = './veccity/cache/{}/evaluate_cache/{}_evaluate_{}_{}_{}.csv'. \
-            format(self.exp_id, self.exp_id, self.model, self.dataset, str(self.embed_size))
+        result_path = './veccity/cache/{}/evaluate_cache/{}_evaluate_{}_{}_{}_{}.csv'. \
+            format(self.exp_id, self.exp_id, self.model, self.dataset, str(self.embed_size),str(self.choice))
         dict_to_csv(self.result, result_path)
         self._logger.info('Evaluate result is saved at {}'.format(result_path))
 

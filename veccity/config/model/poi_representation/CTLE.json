@@ -4,7 +4,7 @@
   "num_heads": 8,
   "mask_prop": 0.2,
   "detach": false,
-  "objective": "mlm",
+  "objective": "mh",
   "static": false,
   "lr_decay": false,
   "learning_rate": 1e-4,

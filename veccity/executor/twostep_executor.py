@@ -12,8 +12,8 @@ class TwoStepExecutor(AbstractExecutor):
         self.exp_id = config.get('exp_id', None)
         self._logger = getLogger()
 
-        total_num = sum([param.nelement() for param in self.model.parameters()])
-        self._logger.info('Total parameter numbers: {}'.format(total_num))
+        # total_num = sum([param.nelement() for param in self.model.parameters()])
+        # self._logger.info('Total parameter numbers: {}'.format(total_num))
 
         self.cache_dir = './veccity/cache/{}/model_cache'.format(self.exp_id)
         self.evaluate_res_dir = './veccity/cache/{}/evaluate_cache'.format(self.exp_id)

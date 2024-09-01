@@ -34,6 +34,8 @@ class MGFNDataset(AbstractDataset):
         self.od_label_path = os.path.join(cache_dir, self.dataset, 'od_region_train_od.npy')
         self.mob_adj = np.load(self.od_label_path)
         self.num_regions = self.mob_adj.shape[0]
+        import pdb
+        pdb.set_trace()
         self.num_nodes = self.num_regions
 
         if os.path.exists(self.mob_patterns_path):

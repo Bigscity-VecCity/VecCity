@@ -97,7 +97,9 @@ class MVUREDataset(AbstractDataset):
                 total += 1
                 poi_type_dict[poi_type] = total
             corpus[region_id].append(num2str(poi_type_dict[poi_type]))
+        
         corpus = [' '.join(_) for _ in corpus]
+        
         # 创建一个 TfidfVectorizer 对象
         tfidf_vectorizer = TfidfVectorizer()
         # 将文本数据转换成 TF-IDF 表示

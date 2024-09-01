@@ -4,10 +4,10 @@ from logging import getLogger
 from sklearn.metrics import  mean_squared_error, mean_absolute_error
 import numpy as np
 from torch.nn.utils.rnn import pad_packed_sequence, pack_padded_sequence
-
+from tqdm import tqdm
 from veccity.evaluator.downstream_models.abstract_model import AbstractModel
 from torch.utils.data import Dataset, DataLoader
-from veccity.evaluator.utils import StandardScaler
+import random
 
 class TrajEncoder(nn.Module):
     def __init__(self, input_dim, hidden_dim, n_layers, embedding, device):
@@ -26,13 +26,12 @@ class TrajEncoder(nn.Module):
         full_embed = [torch.from_numpy(self.embedding[int(i)]).to(torch.float32) for i in path.view(-1)]
         full_embed = torch.stack(full_embed)
         full_embed = full_embed.view(*original_shape, self.input_dim)  # [batch_size, traj_len, embed_size]
-        pack_x = pack_padded_sequence(full_embed, lengths=valid_len, batch_first=True, enforce_sorted=False).to(self.device)
+        pack_x = pack_padded_sequence(full_embed, lengths=valid_len.cpu(), batch_first=True, enforce_sorted=False).to(self.device)
         h0 = torch.zeros(self.n_layers, full_embed.size(0), self.hidden_dim).to(self.device)
         c0 = torch.zeros(self.n_layers, full_embed.size(0), self.hidden_dim).to(self.device)
-        out, _ = self.lstm(pack_x, (h0, c0))
-        out, _ = pad_packed_sequence(out, batch_first=True)
-        out = torch.stack([out[i, int(ind - 1), :] for i, ind in enumerate(valid_len)])  # [batch_size, hidden_dim]
-        return out
+        _, out = self.lstm(pack_x, (h0, c0))
+        
+        return out[0][0]
 
 
 class MLPReg(nn.Module):
@@ -42,20 +41,10 @@ class MLPReg(nn.Module):
         self.num_layers = num_layers
         self.activation = activation
 
-        if not is_static:
-
-            self.lstm=embedding.encode_sequence
-        else:    
-            self.lstm = TrajEncoder(input_dim, hidden_dim, 1, embedding, device)
-
-        self.mlp = nn.Linear(max_len * input_dim, hidden_dim).to(device)
         self.embedding = embedding
-        self.device = device
-        self.max_len = max_len
-        self.hidden_dim = hidden_dim
-        self.input_dim = input_dim
-        self.is_static = is_static
-
+        self.lstm = TrajEncoder(input_dim, input_dim, 1, embedding, device)
+        
+        
         self.layers = []
         self.layers.append(nn.Linear(input_dim, hidden_dim))
         for _ in range(self.num_layers - 2):
@@ -64,11 +53,8 @@ class MLPReg(nn.Module):
         self.layers = nn.ModuleList(self.layers)
 
     def forward(self, path, valid_len,**kwargs):
-        if self.is_static:
-            t = torch.from_numpy(self.embedding[path.cpu()])
-            x = self.mlp(t.view(-1, self.input_dim * self.max_len).float().to(self.device))
-        else:
-            x=self.lstm(path,valid_len,**kwargs)
+        
+        x=self.lstm(path,valid_len,**kwargs)
 
         for i in range(self.num_layers - 1):
             x = self.activation(self.layers[i](x))
@@ -97,14 +83,15 @@ class TravelTimeEstimationModel(AbstractModel):
         self.exp_id = config.get('exp_id', None)
         self.result_path = './veccity/cache/{}/evaluate_cache/regression_{}_{}.npy'. \
             format(self.exp_id, self.alpha, self.n_split)
+        self.choice=config.get('choice',0)
 
     def run(self, embedding_vector, label, embed_model=None,**kwargs):
 
         self._logger.info("--- Time Estimation ---")
         min_len, max_len = self.config.get("tte_min_len", 10), self.config.get("tte_max_len", 128)
         dfs = label['time']
-        num_samples = int(len(dfs) * 0.001)
-        padding_id = 0#embedding_vector.shape[0]
+        num_samples = len(dfs)
+        padding_id = embedding_vector.shape[0]-1
         embedding_vector = np.concatenate((embedding_vector, np.zeros((1, embedding_vector.shape[1]))), axis=0)
         x_arr = np.zeros([num_samples, max_len],dtype=np.int64)
         lens_arr = np.zeros([num_samples], dtype=np.int64)
@@ -128,37 +115,41 @@ class TravelTimeEstimationModel(AbstractModel):
 
         device=self.config.get('device','cpu')
         input_dim=self.config.get('embed_size',128)
-        hidden_dim=self.config.get('d_model', 256)
-        max_epoch = self.config.get('task_epochs',100) 
+        hidden_dim=self.config.get('d_model', 128)
+        max_epoch = self.config.get('task_epoch',100) 
         is_static = self.config.get('is_static',True)
-        train_size = int(num_samples * 0.8)
-        test_size = num_samples - train_size
+        train_size = int(num_samples * 0.6)
+        eval_size=int(num_samples * 0.2)
+        test_size = num_samples - train_size - eval_size
         train_data_X ,train_lens,train_data_y = x_arr[:train_size],lens_arr[:train_size],y_arr[:train_size]
-        test_data_X ,test_lens, test_data_y = x_arr[train_size:],lens_arr[train_size:],y_arr[train_size:]
-
-        means=np.mean(train_data_y)
-        stds=np.std(train_data_y)
-        scaler=StandardScaler(means,stds)
-        train_data_y=scaler.transform(train_data_y)
+        eval_data_X ,eval_lens, eval_data_y = x_arr[train_size:train_size+eval_size],lens_arr[train_size:train_size+eval_size],y_arr[train_size:train_size+eval_size]
+        test_data_X ,test_lens, test_data_y = x_arr[train_size+eval_size:],lens_arr[train_size+eval_size:],y_arr[train_size+eval_size:]   
 
         train_dataset = TimeEstimationDataset(train_data_X,train_lens,train_data_y)
+        eval_dataset = TimeEstimationDataset(eval_data_X,eval_lens,eval_data_y)
         test_dataset = TimeEstimationDataset(test_data_X,test_lens,test_data_y)
-        train_dataloader= DataLoader(train_dataset,batch_size=64,shuffle=True)
-        test_dataloader= DataLoader(test_dataset,batch_size=64,shuffle=False)
 
-        if is_static:
-            model = MLPReg(input_dim, hidden_dim, 3, nn.ReLU(),embedding_vector,is_static,device,max_len).to(device)
-        else:
-            model = MLPReg(input_dim, hidden_dim, 3, nn.ReLU(), embed_model,is_static,device,max_len).to(device)
+        if self.choice:
+            train_dataset=random.choices(train_dataset,k=self.choice)
+            print(f'do random choice {self.choice}')
+
+
+        train_dataloader= DataLoader(train_dataset,batch_size=128,shuffle=True,num_workers=4)
+        eval_dataloader= DataLoader(eval_dataset,batch_size=128,shuffle=False,num_workers=4)
+        test_dataloader= DataLoader(test_dataset,batch_size=128,shuffle=False,num_workers=4)
+
+        
+        model = MLPReg(input_dim, hidden_dim, 2, nn.ReLU(), embedding_vector,is_static,device,max_len).to(device)
+
         opt = torch.optim.Adam(model.parameters(),lr=1e-4)
         loss_fn=nn.MSELoss()
-        patience = 100
+        patience = 10
 
         best = {"best epoch": 0, "mae": 1e9, "rmse": 1e9}
 
         for epoch in range(max_epoch):
             model.train()
-            for batch_x,batch_lens,batch_y in train_dataloader:
+            for batch_x,batch_lens,batch_y in tqdm(train_dataloader):
                 opt.zero_grad()
 
                 batch_x = batch_x.to(device)
@@ -172,28 +163,49 @@ class TravelTimeEstimationModel(AbstractModel):
             model.eval()
             y_preds = []
             y_trues = []
-            for batch_x, batch_lens,batch_y in test_dataloader:
+            for batch_x, batch_lens,batch_y in eval_dataloader:
                 batch_x = batch_x.to(device)
                 batch_lens = batch_lens.to(device)
                 batch_y = batch_y.to(device)
                 y_preds.append(model(batch_x,batch_lens,**kwargs).detach().cpu())
                 y_trues.append(batch_y.detach().cpu())
-        
+            
             y_preds = torch.cat(y_preds, dim=0)
             y_trues = torch.cat(y_trues, dim=0)
 
             mae = mean_absolute_error(y_trues, y_preds)
             rmse = mean_squared_error(y_trues, y_preds) ** 0.5
             self._logger.info(f'Epoch: {epoch}, MAE: {mae.item():.4f}, RMSE: {rmse.item():.4f}')
+            # self._writer.add_scalar('ETA Valid MAE', mae, epoch)
+            # self._writer.add_scalar('ETA Valid RMSE', rmse, epoch)
             if mae < best["mae"]:
                 best = {"best epoch": epoch, "mae": mae, "rmse": rmse}
-                patience = 100
+                patience = 10
+                # best_model=copy.deepcopy(model)
             else:
-                if epoch > 10:
-                    patience -= 1
+                patience -= 1
                 if not patience:
                     self._logger.info("Best epoch: {}, MAE:{}, RMSE:{}".format(best['best epoch'], best['mae'], best["rmse"]))
                     break
+
+        model.eval()
+        y_preds = []
+        y_trues = []
+        for batch_x, batch_lens,batch_y in test_dataloader:
+                batch_x = batch_x.to(device)
+                batch_lens = batch_lens.to(device)
+                batch_y = batch_y.to(device)
+                y_preds.append(model(batch_x,batch_lens,**kwargs).detach().cpu())
+                y_trues.append(batch_y.detach().cpu())
+        
+        y_preds = torch.cat(y_preds, dim=0)
+        y_trues = torch.cat(y_trues, dim=0)
+        mae = mean_absolute_error(y_trues, y_preds)
+        rmse = mean_squared_error(y_trues, y_preds) ** 0.5
+        best['mae']=mae
+        best['rmse']=rmse
+        self._logger.info("Test result:epoch {}, MAE:{}, RMSE:{}".format(best['best epoch'], best['mae'], best["rmse"]))
+        # self._writer.close()
         return best
 
     def clear(self):

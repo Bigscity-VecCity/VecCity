@@ -299,7 +299,7 @@ class BaseDataset(AbstractDataset):
 class TrajectoryProcessingDataset(Dataset):
 
     def __init__(self, data_name, data_type, vocab, seq_len=512,
-                 add_cls=True, merge=True, min_freq=1, max_train_size=None):
+                 add_cls=True, merge=True, min_freq=1, min_seq_len=10, max_train_size=None):
         self.vocab = vocab
         self.seq_len = seq_len
         self.add_cls = add_cls
@@ -343,6 +343,8 @@ class TrajectoryProcessingDataset(Dataset):
         for i in tqdm(range(sub_data.shape[0]), desc=desc):
             traj = sub_data.iloc[i]
             loc_list = eval(traj['path'])
+            if len(loc_list) < 10:
+                continue
             tim_list = eval(traj['tlist'])
             usr_id = traj['usr_id']
             new_loc_list = [self.vocab.loc2index.get(loc, self.vocab.unk_index) for loc in loc_list]
@@ -357,6 +359,7 @@ class TrajectoryProcessingDataset(Dataset):
                 usr_list = [usr_list[0]] + usr_list
                 tim_list = [tim_list[0]] + tim_list
             temporal_mat = self._cal_mat(tim_list)
+
             temporal_mat_list.append(temporal_mat)
             traj_feat = np.array([new_loc_list, tim_list, minutes, weeks, usr_list]).transpose((1, 0))
             traj_list.append(traj_feat)

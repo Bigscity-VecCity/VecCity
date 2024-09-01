@@ -81,6 +81,7 @@ class LineSeqExecutor(object):
         self._writer = SummaryWriter(self.summary_writer_dir)
 
         self.model = model.to(self.device)  # bertlm
+        
         self._logger.info(self.model)
         for name, param in self.model.named_parameters():
             self._logger.info(str(name) + '\t' + str(param.shape) + '\t' +
@@ -92,6 +93,8 @@ class LineSeqExecutor(object):
         self.optimizer = self._build_optimizer()
         self.lr_scheduler = self._build_lr_scheduler()
         self.optimizer.zero_grad()
+        # self.load_model_with_epoch(28)
+        # self.model.to(self.device)
         self.evaluator = get_evaluator(self.config, self.data_feature)
 
 
@@ -104,7 +107,8 @@ class LineSeqExecutor(object):
         """
         ensure_dir(self.cache_dir)
         config = dict()
-        config['model'] = self.model.cpu()
+        # config['model'] = self.model.cpu()
+        config['model_state_dict']=self.model.state_dict()
         config['optimizer_state_dict'] = self.optimizer.state_dict()
         torch.save(config, cache_name)
         self.model.to(self.device)
@@ -132,9 +136,34 @@ class LineSeqExecutor(object):
         """
         assert os.path.exists(cache_name), 'Weights at {} not found' % cache_name
         checkpoint = torch.load(cache_name, map_location='cpu')
-        self.model.load_state_dict(checkpoint['model'].state_dict())
+        # try:
+            # import pdb
+            # pdb.set_trace()
+        # checkpoint['model_state_dict']['model.transformer.embed.tok_embed.weight']=checkpoint['model_state_dict']['model.transformer.embed.tok_embed.weight'][:self.model.model.transformer.embed.tok_embed.weight.shape[0]]
+
+            # checkpoint['model_state_dict']['model.node_embedding.weight']=checkpoint['model_state_dict']['model.node_embedding.weight'][:self.model.model.node_embedding.weight.shape[0]]
+        # checkpoint['model_state_dict']['model.decoder.weight'] = checkpoint['model_state_dict']['model.decoder.weight'][:self.model.model.transformer.embed.tok_embed.weight.shape[0]]
+        # checkpoint['model_state_dict']['model.decoder.bias'] = checkpoint['model_state_dict']['model.decoder.bias'][:self.model.model.transformer.embed.tok_embed.weight.shape[0]]
+        # except Exception:
+        checkpoint['model_state_dict']=checkpoint['model'].state_dict()
+        # import pdb
+        # pdb.set_trace()
+        # checkpoint['model_state_dict']['model.transformer.embed.tok_embed.weight'][:self.model.model.transformer.embed.tok_embed.weight.shape[0]]=checkpoint['model_state_dict']['model.transformer.embed.tok_embed.weight'][:self.model.model.transformer.embed.tok_embed.weight.shape[0]]
+        # checkpoint['model_state_dict']['model.decoder.weight'] = checkpoint['model_state_dict']['model.decoder.weight'][:self.model.model.transformer.embed.tok_embed.weight.shape[0]]
+        # checkpoint['model_state_dict']['model.decoder.bias'] = checkpoint['model_state_dict']['model.decoder.bias'][:self.model.model.transformer.embed.tok_embed.weight.shape[0]]
+        # try:
+        #     checkpoint['model_state_dict']=checkpoint['model'].state_dict()
+        #     checkpoint['model_state_dict']['model.node_embedding.weight'] = checkpoint['model_state_dict']['model.node_embedding.weight'][:self.model.model.node_embedding.weight.shape[0]]
+        #     self.model.load_state_dict(checkpoint['model_state_dict'])
+        # except Exception:
+        # checkpoint['model_state_dict']['model.node_embedding.weight'] = checkpoint['model_state_dict']['model.node_embedding.weight'][:self.model.model.node_embedding.weight.shape[0]]
+        #     self.model.load_state_dict(checkpoint['model_state_dict'])
+
+
+        self.model.load_state_dict(checkpoint['model_state_dict'])
         self.model.to(self.device)
         # self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+        # self.save_model(cache_name)
         self._logger.info("Loaded model at " + cache_name)
 
     def save_model_with_epoch(self, epoch):
@@ -146,9 +175,9 @@ class LineSeqExecutor(object):
         """
         ensure_dir(self.cache_dir)
         config = dict()
-        config['model'] = self.model.cpu()
-        config['optimizer_state_dict'] = self.optimizer.state_dict()
-        config['epoch'] = epoch
+        config['model_state_dict'] = self.model.state_dict()
+        # config['optimizer_state_dict'] = self.optimizer.state_dict()
+        # config['epoch'] = epoch
         model_path = self.cache_dir + '/' + self.config['model'] + '_' + self.config['dataset'] + '_epoch%d.tar' % epoch
         torch.save(config, model_path)
         self.model.to(self.device)
@@ -165,8 +194,9 @@ class LineSeqExecutor(object):
         model_path = self.cache_dir + '/' + self.config['model'] + '_' + self.config['dataset'] + '_epoch%d.tar' % epoch
         assert os.path.exists(model_path), 'Weights at epoch %d not found' % epoch
         checkpoint = torch.load(model_path, map_location=self.device)
-        self.model = checkpoint['model'].to(self.device)
-        self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+        # self.model = checkpoint['model'].to(self.device)
+        self.model.load_state_dict(checkpoint['model_state_dict'])
+        # self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
         self._logger.info("Loaded model at {}".format(epoch))
 
     def _build_optimizer(self):

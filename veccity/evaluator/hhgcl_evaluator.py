@@ -23,6 +23,7 @@ from sklearn.preprocessing import normalize
 from veccity.utils import gen_index_map, ensure_dir
 from veccity.data.preprocess import cache_dir
 from veccity.evaluator.utils import generate_road_representaion_downstream_data
+import random
 
 
 class Classifier(nn.Module):
@@ -51,7 +52,7 @@ def metrics_local(y_truths, y_preds):
     return mae, rmse, mape, r2
 
 
-def evaluation_classify(X, y, kfold=5, num_classes=5, seed=42, output_dim=128):
+def evaluation_classify(X, y, kfold=5, num_classes=5, seed=42, output_dim=128,choice=100):
     KF = StratifiedKFold(n_splits=kfold, random_state=seed, shuffle=True)
     # 模型训练
     y_preds = []
@@ -59,6 +60,20 @@ def evaluation_classify(X, y, kfold=5, num_classes=5, seed=42, output_dim=128):
     for fold_num, (train_idx, val_idx) in enumerate(KF.split(X, y)):
         X_train, X_eval = X[train_idx], X[val_idx]
         y_train, y_eval = y[train_idx], y[val_idx]
+
+        if choice <100:
+            cur_lens=len(X_train)
+            k=int(cur_lens*choice/100)
+            index_range=list(range(cur_lens))
+            select_index=random.choices(index_range,k=k)
+            X_train=X_train[select_index]
+            y_train=y_train[select_index]
+            if fold_num==0:
+                print(f"do choice with {choice}%")
+                print(f"befor is {cur_lens}")
+                after=len(X_train)
+                print(f"after is {after}")
+
         X_train = torch.tensor(X_train).cuda()
         X_eval = torch.tensor(X_eval).cuda()
         y_train = torch.tensor(y_train).cuda()
@@ -91,7 +106,7 @@ def evaluation_classify(X, y, kfold=5, num_classes=5, seed=42, output_dim=128):
     micro_f1 = f1_score(y_trues, y_preds, average='micro')
     return micro_f1, macro_f1
 
-def evaluation_bilinear_reg(embedding, flow, kfold=5, seed=42, output_dim=128):
+def evaluation_bilinear_reg(embedding, flow, kfold=5, seed=42, output_dim=128,choice=100):
     """
     :param embedding: node_num*output_dim
     :param flow: node_num*node_num
@@ -116,6 +131,18 @@ def evaluation_bilinear_reg(embedding, flow, kfold=5, seed=42, output_dim=128):
     for fold_num, (train_idx, val_idx) in enumerate(kf.split(X, y)):
         X_train, X_eval = X[train_idx], X[val_idx]
         y_train, y_eval = y[train_idx], y[val_idx]
+        if choice <100:
+            cur_lens=len(X_train)
+            k=int(cur_lens*choice/100)
+            index_range=list(range(cur_lens))
+            select_index=random.choices(index_range,k=k)
+            X_train=X_train[select_index]
+            y_train=y_train[select_index]
+            if fold_num==0:
+                print(f"do choice with {choice}%")
+                print(f"befor is {cur_lens}")
+                after=len(X_train)
+                print(f"after is {after}")
         X_train = torch.tensor(X_train).cuda()
         X_eval = torch.tensor(X_eval).cuda()
         y_train = torch.tensor(y_train).cuda()
@@ -126,7 +153,7 @@ def evaluation_bilinear_reg(embedding, flow, kfold=5, seed=42, output_dim=128):
         best_mse = 1e20
         best_pred = 0
 
-        for e in range(2000):
+        for e in range(100):
             model.train()
             opt.zero_grad()
             mse_loss = criterion(model(X_train.float()).squeeze(),y_train)
@@ -148,7 +175,7 @@ def evaluation_bilinear_reg(embedding, flow, kfold=5, seed=42, output_dim=128):
     return mae,rmse,mape,r2
 
 
-def evaluation_reg(origin_X, origin_y, kfold=5, seed=42, output_dim=128):
+def evaluation_reg(origin_X, origin_y, kfold=5, seed=42, output_dim=128,choice=100):
     kf = KFold(n_splits=kfold, random_state=seed, shuffle=True)
     X, y = [], []
     for i, v in enumerate(origin_y):
@@ -162,6 +189,19 @@ def evaluation_reg(origin_X, origin_y, kfold=5, seed=42, output_dim=128):
     for fold_num, (train_idx, test_idx) in enumerate(kf.split(X, y)):
         X_train, X_test = X[train_idx], X[test_idx]
         y_train, y_test = y[train_idx], y[test_idx]
+
+        if choice <100:
+            cur_lens=len(X_train)
+            k=int(cur_lens*choice/100)
+            index_range=list(range(cur_lens))
+            select_index=random.choices(index_range,k=k)
+            X_train=X_train[select_index]
+            y_train=y_train[select_index]
+            if fold_num==0:
+                print(f"do choice with {choice}%")
+                print(f"befor is {cur_lens}")
+                after=len(X_train)
+                print(f"after is {after}")
 
         reg = linear_model.Ridge(alpha=1.0, random_state=seed)
         reg.fit(X_train, y_train)
@@ -189,13 +229,14 @@ class HHGCLEvaluator(AbstractEvaluator):
         self.seed = config.get('seed', 0)
         self.data_path = './raw_data/' + self.dataset + '/'
         self.output_dim = config.get('output_dim', 128)
+        self.embed_size=config.get('embed_size',128)
         self.roadid = config.get('roadid', None)
         self.regionid = config.get('regionid', None)
         self.data_label = {}
         self.region_embedding_path = './veccity/cache/{}/evaluate_cache/region_embedding_{}_{}_{}.npy'\
             .format(self.exp_id, self.model_name, self.dataset, self.output_dim)
         self.road_embedding_path = './veccity/cache/{}/evaluate_cache/road_embedding_{}_{}_{}.npy'\
-            .format(self.exp_id, self.model_name, self.dataset, self.output_dim)
+            .format(self.exp_id, self.model_name, self.dataset, self.embed_size)
         geo_df = pd.read_csv(os.path.join('raw_data', self.dataset, self.dataset + '.geo'))
         self.num_nodes = geo_df[geo_df['traffic_type'] == self.representation_object].shape[0]
         self.num_regions = geo_df[geo_df['traffic_type'] == 'region'].shape[0]
@@ -203,6 +244,7 @@ class HHGCLEvaluator(AbstractEvaluator):
         self.num_pois = geo_df[geo_df['traffic_type'] == 'poi'].shape[0]
         self.label_data_path = os.path.join('veccity', 'cache', 'dataset_cache', self.dataset, 'label_data')
         self.preprocesse_data()
+        self.choice=config.get('choice',0)
 
     def collect(self, batch):
         pass
@@ -276,7 +318,7 @@ class HHGCLEvaluator(AbstractEvaluator):
         self._logger.info(
             f'Selected {self.representation_object} emb shape = {X.shape}, label shape = {y.shape}, label min = {y.min()}, label max = {y.max()}, num_classes = {num_classes}')
         micro_f1, macro_f1 = evaluation_classify(X, y, kfold=5, num_classes=num_classes, seed=self.seed,
-                                                           output_dim=self.output_dim)
+                                                           output_dim=self.output_dim,choice=self.choice)
         self._logger.info('micro F1: {:6f}, macro F1: {:6f}'.format(micro_f1, macro_f1))
         return y,useful_index,micro_f1, macro_f1
     
@@ -284,7 +326,7 @@ class HHGCLEvaluator(AbstractEvaluator):
         dyna = 'traj' if self.representation_object == 'road' else 'od'
         self._logger.warning(f'Evaluating {self.representation_object} OD-Flow Prediction Using Bilinear Module')
         od_flow = np.load(os.path.join(cache_dir, self.dataset, f'{dyna}_{self.representation_object}_test_od.npy')).astype('float32')
-        mae,rmse,mape,r2 = evaluation_bilinear_reg(emb, od_flow, kfold=5, seed=self.seed, output_dim=self.output_dim)
+        mae,rmse,mape,r2 = evaluation_bilinear_reg(emb, od_flow, kfold=5, seed=self.seed, output_dim=self.output_dim,choice=self.choice)
         self._logger.info(f"Result of odflow bilinear estimation in {self.dataset}:")
         self._logger.info('MAE = {:6f}, RMSE = {:6f}, R2 = {:6f}, MAPE = {:6f}'.format(mae,rmse,r2,mape))
         return mae, rmse, r2, mape
@@ -293,13 +335,13 @@ class HHGCLEvaluator(AbstractEvaluator):
         dyna = 'traj' if self.representation_object == 'road' else 'od'
         self._logger.warning(f'Evaluating {self.representation_object} In-Flow Prediction')
         inflow = np.load(os.path.join(cache_dir, self.dataset, f'{dyna}_{self.representation_object}_test_in_avg.npy')).astype('float32')
-        in_mae, in_rmse, in_mape, in_r2 = evaluation_reg(emb, inflow, kfold=5, seed=self.seed, output_dim=self.output_dim)
+        in_mae, in_rmse, in_mape, in_r2 = evaluation_reg(emb, inflow, kfold=5, seed=self.seed, output_dim=self.output_dim,choice=self.choice)
         self._logger.info(f"Result of inflow estimation in {self.dataset}:")
         self._logger.info('MAE = {:6f}, RMSE = {:6f}, R2 = {:6f}, MAPE = {:6f}'.format(in_mae, in_rmse, in_r2, in_mape))
 
         self._logger.warning(f'Evaluating {self.representation_object} Out-Flow Prediction')
         outflow = np.load(os.path.join(cache_dir, self.dataset, f'{dyna}_{self.representation_object}_test_out_avg.npy')).astype('float32')
-        out_mae, out_rmse, out_mape, out_r2 = evaluation_reg(emb, outflow, kfold=5, seed=self.seed, output_dim=self.output_dim)
+        out_mae, out_rmse, out_mape, out_r2 = evaluation_reg(emb, outflow, kfold=5, seed=self.seed, output_dim=self.output_dim,choice=self.choice)
         self._logger.info("Result of {} estimation in {}:".format('outflow', self.dataset))
         self._logger.info('MAE = {:6f}, RMSE = {:6f}, R2 = {:6f}, MAPE = {:6f}'.format(out_mae, out_rmse, out_r2, out_mape))
 
@@ -313,12 +355,12 @@ class HHGCLEvaluator(AbstractEvaluator):
     
     def preprocesse_data(self):
         if self.representation_object == 'road':
-            data_path1 = os.path.join("veccity/cache/dataset_cache", self.dataset, "label_data", "speed.csv")
+            data_path1 = os.path.join("veccity/cache/dataset_cache", self.dataset, "label_data", "avg_speeds.csv")
             data_path2 = os.path.join("veccity/cache/dataset_cache", self.dataset, "label_data", "time.csv")
             if not os.path.exists(data_path1) or not os.path.exists(data_path2):
                 generate_road_representaion_downstream_data(self.dataset)
 
-            self.speed_label = pd.read_csv(os.path.join(self.label_data_path, "speed.csv"))
+            self.speed_label = pd.read_csv(os.path.join(self.label_data_path, "avg_speeds.csv"))
             self.speed_label.sort_values(by="index", inplace=True, ascending=True)
 
             min_len, max_len = self.config.get("tte_min_len", 1), self.config.get("tte_max_len", 100)
@@ -373,9 +415,9 @@ class HHGCLEvaluator(AbstractEvaluator):
                     result = downstream_model.run(emb, label)
                 if task in ["tte"]:
                     label = self.data_label[task]
-                    result = downstream_model.run(emb, label,model, **kwargs)
+                    result = downstream_model.run(emb, label, model, **kwargs)
                 elif task in ['sts']:
-                    result = downstream_model.run(model=model,**kwargs)
+                    result = downstream_model.run(emb,**kwargs)
                 self.result.update(add_prefix_to_keys(result, task + '_'))
             if 'tte_best epoch' in self.result.keys():
                 del self.result['tte_best epoch']
@@ -411,13 +453,13 @@ class HHGCLEvaluator(AbstractEvaluator):
                     y_truth,useful_index,micro_f1, macro_f1 = self._valid_clf(emb)
                     self.result['clf_micro_f1'] = [micro_f1]
                     self.result['clf_macro_f1'] = [macro_f1]
-                    self._logger.warning(f'Evaluating {self.representation_object} Emb by TSNE ans Kmeans')
-                    sc, db, ch, nmi, ars = self.evaluation_cluster(y_truth,useful_index,emb, self.representation_object)
-                    self.result['sc'] = [sc]
-                    self.result['db'] = [db]
-                    self.result['ch'] = [ch]
-                    self.result['nmi'] = [nmi]
-                    self.result['ars'] = [ars]
+                    # self._logger.warning(f'Evaluating {self.representation_object} Emb by TSNE ans Kmeans')
+                    # sc, db, ch, nmi, ars = self.evaluation_cluster(y_truth,useful_index,emb, self.representation_object)
+                    # self.result['sc'] = [sc]
+                    # self.result['db'] = [db]
+                    # self.result['ch'] = [ch]
+                    # self.result['nmi'] = [nmi]
+                    # self.result['ars'] = [ars]
 
     def get_downstream_model(self, model):
         try:
@@ -433,8 +475,8 @@ class HHGCLEvaluator(AbstractEvaluator):
         self._logger.info(self.result)
         df = pd.DataFrame(self.result, index=[0])
         self._logger.info(df)
-        result_path = './veccity/cache/{}/evaluate_cache/{}_evaluate_{}_{}_{}.csv'. \
-            format(self.exp_id, self.exp_id, self.model_name, self.dataset, str(self.output_dim))
+        result_path = './veccity/cache/{}/evaluate_cache/{}_evaluate_{}_{}_{}_{}.csv'. \
+            format(self.exp_id, self.exp_id, self.model_name, self.dataset, str(self.output_dim),str(self.choice))
         if self.config.get('save_result', True):
             df.to_csv(result_path, index=False)
         else:

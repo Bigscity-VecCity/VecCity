@@ -7,10 +7,10 @@ from torch.nn.utils.rnn import pad_packed_sequence, pack_padded_sequence
 from torch.utils.tensorboard import SummaryWriter
 
 from veccity.evaluator.downstream_models.abstract_model import AbstractModel
-from torch.utils.data import Dataset, DataLoader
-from veccity.evaluator.utils import StandardScaler
+from torch.utils.data import Dataset
 from veccity.data.dataset.dataset_subclass.eta_dataset import ETADataset
 import copy
+from tqdm import tqdm
 
 class TrajEncoder(nn.Module):
     def __init__(self, input_dim, hidden_dim, n_layers, embedding, device):
@@ -44,7 +44,7 @@ class MLPReg(nn.Module):
 
         self.num_layers = num_layers
         self.activation = activation   
-        self.encoder=embedding.encode_sequence
+        self.encoder=embedding
         
         self.device = device
         self.max_len = max_len
@@ -60,7 +60,7 @@ class MLPReg(nn.Module):
 
     def forward(self, batch):
        
-        x=self.encoder(batch)
+        x=self.encoder.encode_sequence(batch)
 
         for i in range(self.num_layers - 1):
             x = self.activation(self.layers[i](x))
@@ -95,7 +95,6 @@ class TravelTimeEstimationModel(AbstractModel):
         self.summary_writer_dir = './veccity/cache/{}'.format(self.exp_id)
         self._writer = SummaryWriter(self.summary_writer_dir)
 
-
     def run(self, embed_model,**kwargs):
         input_dim=self.config.get('embed_size',128)
         hidden_dim=self.config.get('downstream_hidden_size',512)
@@ -116,14 +115,16 @@ class TravelTimeEstimationModel(AbstractModel):
         for epoch in range(max_epoch):
             model.train()
             losses=[]
-            for batch in self.train_dataloader:
+            
+            for batch in tqdm(self.train_dataloader):
                 opt.zero_grad()
-                batch=batch.update(kwargs)
+                batch.update(kwargs)
                 preds=model(batch)
                 loss = loss_fn(preds, batch['targets'].squeeze().to(self.device))
                 loss.backward()
                 opt.step()
                 losses.append(loss.item())
+                
             
             self._writer.add_scalar('ETA Train loss', np.mean(losses), epoch)
             self._logger.info(f"ETA EPOCH {epoch} Train loss : {np.mean(losses)}")
@@ -132,6 +133,7 @@ class TravelTimeEstimationModel(AbstractModel):
             y_preds = []
             y_trues = []
             for batch in self.eval_dataloader:
+                batch.update(kwargs)
                 y_preds.append(model(batch).detach().cpu())
                 y_trues.append(batch['targets'].detach().cpu())
             
@@ -146,18 +148,19 @@ class TravelTimeEstimationModel(AbstractModel):
             if mae < best["mae"]:
                 best = {"best epoch": epoch, "mae": mae, "rmse": rmse}
                 patience = 10
-                best_model=copy.deepcopy(model)
+                # best_model=copy.deepcopy(model)
             else:
                 patience -= 1
                 if not patience:
                     self._logger.info("Best epoch: {}, MAE:{}, RMSE:{}".format(best['best epoch'], best['mae'], best["rmse"]))
                     break
 
-        model=best_model
+        # model=best_model
         model.eval()
         y_preds = []
         y_trues = []
         for batch in self.test_dataloader:
+            batch.update(kwargs)
             y_preds.append(model(batch).detach().cpu())
             y_trues.append(batch['targets'].detach().cpu())
         

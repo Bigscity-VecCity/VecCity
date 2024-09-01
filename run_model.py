@@ -23,6 +23,9 @@ if __name__ == '__main__':
                         default=True, help='whether save the trained model')
     parser.add_argument('--train', type=str2bool, default=True,
                         help='whether re-train model if the model is trained before')
+    parser.add_argument('--choice', type=int, default=0,
+                        help='whether re-train model if the model is trained before')
+    parser.add_argument('--abl', type=str, default='none')
     parser.add_argument('--exp_id', type=str, default=None, help='id of experiment')
     parser.add_argument('--seed', type=int, default=0, help='random seed')
     parser.add_argument('--save_result', type=str2bool, default=True, help='save result or not')

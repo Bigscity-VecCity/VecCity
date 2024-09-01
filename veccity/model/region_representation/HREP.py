@@ -135,7 +135,6 @@ class HRE(nn.Module):
         poi_emb, s_emb, d_emb, n_emb, poi_r, s_r, d_r, n_r = self.relation_gcns(features, rel_emb,
                                                                                 edge_index, is_training)
         n_f, poi_f, s_f, d_f = self.cross_layer(n_emb, poi_emb, s_emb, d_emb)
-
         region_feature = self.fusion_layer(n_f, poi_f, s_f, d_f)
 
         n_f = torch.multiply(region_feature, n_r)

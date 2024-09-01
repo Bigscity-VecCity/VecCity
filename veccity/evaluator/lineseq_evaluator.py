@@ -23,7 +23,7 @@ from veccity.utils import gen_index_map, ensure_dir
 from veccity.data.preprocess import cache_dir
 from veccity.evaluator.utils import generate_road_representaion_downstream_data
 from veccity.evaluator.downstream_models.travel_time_estimation2 import TravelTimeEstimationModel
-from veccity.evaluator.downstream_models.speed_inference import SpeedInferenceModel
+from veccity.evaluator.downstream_models.speed_inference2 import SpeedInferenceModel
 from veccity.evaluator.downstream_models.similarity_search_model2 import STSExecutor
 
 
@@ -204,6 +204,7 @@ class LineSeqEvaluator(AbstractEvaluator):
         self.num_roads = geo_df[geo_df['traffic_type'] == 'road'].shape[0]
         self.num_pois = geo_df[geo_df['traffic_type'] == 'poi'].shape[0]
         self.label_data_path = os.path.join('veccity', 'cache', 'dataset_cache', self.dataset, 'label_data')
+        self.choice=config.get('choice',0)
         self.preprocesse_data()
 
     def collect(self, batch):
@@ -385,8 +386,8 @@ class LineSeqEvaluator(AbstractEvaluator):
         self._logger.info(self.result)
         df = pd.DataFrame(self.result, index=[0])
         self._logger.info(df)
-        result_path = './veccity/cache/{}/evaluate_cache/{}_evaluate_{}_{}_{}.csv'. \
-            format(self.exp_id, self.exp_id, self.model_name, self.dataset, str(self.output_dim))
+        result_path = './veccity/cache/{}/evaluate_cache/{}_evaluate_{}_{}_{}_{}.csv'. \
+            format(self.exp_id, self.exp_id, self.model_name, self.dataset, str(self.output_dim),str(self.choice))
         if self.config.get('save_result', True):
             df.to_csv(result_path, index=False)
         else:

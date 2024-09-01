@@ -65,7 +65,7 @@ class Toast(AbstractReprLearningModel):
         return loss
     
     def encode_sequence(self, batch):
-        seq=batch['seq'].to(self.device)
+        seq=batch['seq'][...,0].to(self.device)
         padding_masks=batch['padding_masks'].to(self.device)
         return self.model.encode_sequence(seq,padding_masks)     
 
@@ -209,8 +209,9 @@ class Embeddings(nn.Module):
         seq_len = x.size(1)
         pos = torch.arange(seq_len, dtype=torch.long, device=x.device)
         pos = pos.unsqueeze(0).expand_as(x) # (S,) -> (B, S)
-
         e = self.tok_embed(x) + self.pos_embed(pos)
+        
+            
         return self.drop(self.norm(e))
 
 
@@ -489,8 +490,10 @@ class Word2Vec_SG:
         for i in range(self.vocab.specials_num):
             ind_to_loc[i]=checkpoint['input_emb.weight'].shape[0]-1
         checkpoint['input_emb.weight']=checkpoint['input_emb.weight'][ind_to_loc,:]
-        checkpoint['output_emb.weight']=checkpoint['output_emb.weight'][ind_to_loc,:]
+        checkpoint['output_emb.weight']=checkpoint['output_emb.weight'][ind_to_loc,:self.model.output_emb.weight.shape[1]]
+        # checkpoint['type_pred.weight']=checkpoint['type_pred.weight'][:self.model.type_pred.weight.shape[0]]
         self.model.load_state_dict(checkpoint)
+        # self.save_model(100,model_path)
 
     def vector(self, index):
         self.model.predict(index)

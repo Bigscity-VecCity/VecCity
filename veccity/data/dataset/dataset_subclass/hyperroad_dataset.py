@@ -320,7 +320,7 @@ class HyperRoadDataset(AbstractDataset):
             if feature_col is not None:
                 hyper_feature_i['cluster'] = self.region_geo_df.loc[i, feature_col]
             else:
-                hyper_feature_i['cluster'] = 0
+                hyper_feature_i['cluster'] = i
             hyper_feature[i] = hyper_feature_i
         return hyper_feature
     

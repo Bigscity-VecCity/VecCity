@@ -14,6 +14,7 @@ import pickle
 from veccity.data.dataset.dataset_subclass.bert_vocab import WordVocab
 from veccity.data.dataset.dataset_subclass.bert_base_dataset import TrajectoryProcessingDataset
 import datetime
+import random
 
 
 
@@ -60,7 +61,7 @@ class LineSeqDataset(AbstractDataset):
         self.add_cls = self.config.get('add_cls', True)
         self.merge = self.config.get('merge', True)
         self.max_train_size = self.config.get('max_train_size', None)
-        self.num_workers = self.config.get('num_workers', 4)
+        self.num_workers = self.config.get('num_workers', 0)
 
         # cache_dir
         self.cache_file_folder = './veccity/cache/dataset_cache/'
@@ -77,6 +78,7 @@ class LineSeqDataset(AbstractDataset):
         self.road_adj=self.road_adj[select_geos,:]
         self.road_geo_df=self.road_geo_df.iloc[select_geos]
         self.num_nodes=self.vocab_size
+        self.choice=config.get('choice',0)
 
     def construct_road_adj(self):
         self.road_adj = np.zeros(shape=[self.road_num,self.road_num])
@@ -130,6 +132,9 @@ class LineSeqDataset(AbstractDataset):
                                                    seq_len=self.seq_len, add_cls=self.add_cls,
                                                    merge=self.merge, min_freq=self.min_freq,
                                                    max_train_size=None)
+        if self.choice:
+            train_dataset=random.choices(train_dataset,k=self.choice)
+            print(f'do random choice {self.choice}')
         return train_dataset, eval_dataset, test_dataset
 
 
@@ -138,11 +143,11 @@ class LineSeqDataset(AbstractDataset):
         train_dataloader = DataLoader(train_dataset, batch_size=self.batch_size,
                                       num_workers=self.num_workers, shuffle=True,
                                       collate_fn=lambda x: self.collate_fn(x, max_len=self.seq_len,
-                                                                           vocab=self.vocab, add_cls=self.add_cls))
+                                                                           vocab=self.vocab, add_cls=self.add_cls),drop_last=True)
         eval_dataloader = DataLoader(eval_dataset, batch_size=self.batch_size,
                                      num_workers=self.num_workers, shuffle=True,
                                      collate_fn=lambda x: self.collate_fn(x, max_len=self.seq_len,
-                                                                          vocab=self.vocab, add_cls=self.add_cls))
+                                                                          vocab=self.vocab, add_cls=self.add_cls),drop_last=True)
         test_dataloader = DataLoader(test_dataset, batch_size=self.batch_size,
                                      num_workers=self.num_workers, shuffle=False,
                                      collate_fn=lambda x: self.collate_fn(x, max_len=self.seq_len,

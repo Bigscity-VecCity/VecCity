@@ -1,0 +1,31 @@
+Traceback (most recent call last):
+  File "run_model.py", line 7, in <module>
+    from veccity.pipeline import run_model
+  File "/home/zhangwt/remote/zwt/Map3.0/veccity/pipeline/__init__.py", line 1, in <module>
+    from veccity.pipeline.pipeline import run_model, hyper_parameter, objective_function
+  File "/home/zhangwt/remote/zwt/Map3.0/veccity/pipeline/pipeline.py", line 2, in <module>
+    from ray import tune
+  File "/home/zhangwt/miniconda3/envs/torch/lib/python3.7/site-packages/ray/tune/__init__.py", line 2, in <module>
+    from ray.tune.tune import run_experiments, run
+  File "/home/zhangwt/miniconda3/envs/torch/lib/python3.7/site-packages/ray/tune/tune.py", line 13, in <module>
+    from ray.tune.analysis import ExperimentAnalysis
+  File "/home/zhangwt/miniconda3/envs/torch/lib/python3.7/site-packages/ray/tune/analysis/__init__.py", line 1, in <module>
+    from ray.tune.analysis.experiment_analysis import ExperimentAnalysis
+  File "/home/zhangwt/miniconda3/envs/torch/lib/python3.7/site-packages/ray/tune/analysis/experiment_analysis.py", line 17, in <module>
+    import pandas as pd
+  File "/home/zhangwt/miniconda3/envs/torch/lib/python3.7/site-packages/pandas/__init__.py", line 50, in <module>
+    from pandas.core.api import (
+  File "/home/zhangwt/miniconda3/envs/torch/lib/python3.7/site-packages/pandas/core/api.py", line 48, in <module>
+    from pandas.core.groupby import (
+  File "/home/zhangwt/miniconda3/envs/torch/lib/python3.7/site-packages/pandas/core/groupby/__init__.py", line 1, in <module>
+    from pandas.core.groupby.generic import (
+  File "/home/zhangwt/miniconda3/envs/torch/lib/python3.7/site-packages/pandas/core/groupby/generic.py", line 76, in <module>
+    from pandas.core.groupby.groupby import (
+  File "/home/zhangwt/miniconda3/envs/torch/lib/python3.7/site-packages/pandas/core/groupby/groupby.py", line 94, in <module>
+    from pandas.core.groupby import (
+  File "<frozen importlib._bootstrap>", line 983, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 967, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 724, in exec_module
+  File "<frozen importlib._bootstrap_external>", line 818, in get_code
+KeyboardInterrupt

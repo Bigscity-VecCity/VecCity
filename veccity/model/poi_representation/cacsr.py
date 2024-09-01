@@ -1,26 +1,14 @@
-from asyncio import base_tasks
-import os
+
 import torch
 import torch.nn as nn
-import numpy as np
 from torch.nn.utils.rnn import pack_padded_sequence
 from torch.nn.utils.rnn import pad_packed_sequence
 import torch.nn.functional as F
-from torch import nn
-import random
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
 import copy
 import math
-import torch.utils.data as data_utils
 from torch.distributions import Uniform
-import itertools
-from veccity.model.poi_representation.utils import construct_spatial_matrix_accordingDistance, tid_list_48,next_batch
 from veccity.model.abstract_model import AbstractModel
-from veccity.model.poi_representation.cacsr_sample import cacsr_sample
-import os
-import pandas as pd
+
 
 class DotDict(dict):
     __getattr__ = dict.__getitem__
@@ -749,7 +737,6 @@ class CACSR(AbstractModel):
 
         # unpack
         lstm_out, out_len = pad_packed_sequence(lstm_out, batch_first=True)
-
         return lstm_out
 
 # class CacsrData:

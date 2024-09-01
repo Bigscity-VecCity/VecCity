@@ -1,7 +1,7 @@
 {
   "embed_size": 128,
   "task_epoch": 100,
-  "embed_epoch": 5,
+  "embed_epoch": 100,
   "pre_len": 1,
   "init_param": false,
   "batch_size": 64,
