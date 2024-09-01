@@ -135,17 +135,18 @@ class LineSeqExecutor(object):
             cache_name(str): 保存的文件名
         """
         assert os.path.exists(cache_name), 'Weights at {} not found' % cache_name
+
         checkpoint = torch.load(cache_name, map_location='cpu')
         # try:
-            # import pdb
-            # pdb.set_trace()
+        # import pdb
+        # pdb.set_trace()
         # checkpoint['model_state_dict']['model.transformer.embed.tok_embed.weight']=checkpoint['model_state_dict']['model.transformer.embed.tok_embed.weight'][:self.model.model.transformer.embed.tok_embed.weight.shape[0]]
 
             # checkpoint['model_state_dict']['model.node_embedding.weight']=checkpoint['model_state_dict']['model.node_embedding.weight'][:self.model.model.node_embedding.weight.shape[0]]
         # checkpoint['model_state_dict']['model.decoder.weight'] = checkpoint['model_state_dict']['model.decoder.weight'][:self.model.model.transformer.embed.tok_embed.weight.shape[0]]
         # checkpoint['model_state_dict']['model.decoder.bias'] = checkpoint['model_state_dict']['model.decoder.bias'][:self.model.model.transformer.embed.tok_embed.weight.shape[0]]
         # except Exception:
-        checkpoint['model_state_dict']=checkpoint['model'].state_dict()
+        # checkpoint['model_state_dict']=checkpoint['model'].state_dict()
         # import pdb
         # pdb.set_trace()
         # checkpoint['model_state_dict']['model.transformer.embed.tok_embed.weight'][:self.model.model.transformer.embed.tok_embed.weight.shape[0]]=checkpoint['model_state_dict']['model.transformer.embed.tok_embed.weight'][:self.model.model.transformer.embed.tok_embed.weight.shape[0]]

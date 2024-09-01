@@ -13,9 +13,9 @@ from torch.utils.data import TensorDataset
 from torch.utils.data.dataloader import DataLoader
 
 from veccity.data.dataset import AbstractDataset
-from veccity.model.road_representation.HRNR import GraphConvolution as GCN
-from veccity.model.road_representation.HRNR import SPGAT as GAT
-from veccity.model.road_representation.HRNR import get_sparse_adj
+from veccity.upstream.road_representation.HRNR import GraphConvolution as GCN
+from veccity.upstream.road_representation.HRNR import SPGAT as GAT
+from veccity.upstream.road_representation.HRNR import get_sparse_adj
 from veccity.utils import ensure_dir
 from logging import getLogger
 from veccity.data.preprocess import preprocess_all, cache_dir

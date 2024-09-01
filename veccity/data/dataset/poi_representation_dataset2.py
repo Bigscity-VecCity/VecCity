@@ -11,13 +11,13 @@ from random import *
 from itertools import zip_longest
 from veccity.data.utils import pad_session_data_one
 from veccity.data.dataset import AbstractDataset
-from veccity.model.poi_representation.utils import next_batch, init_seed
-from veccity.model.poi_representation.tale import TaleData
-from veccity.model.poi_representation.poi2vec import P2VData
-from veccity.model.poi_representation.teaser import TeaserData
-from veccity.model.poi_representation.w2v import SkipGramData
+from veccity.upstream.poi_representation.utils import next_batch, init_seed
+from veccity.upstream.poi_representation.tale import TaleData
+from veccity.upstream.poi_representation.poi2vec import P2VData
+from veccity.upstream.poi_representation.teaser import TeaserData
+from veccity.upstream.poi_representation.w2v import SkipGramData
 from datetime import datetime
-# from veccity.model.poi_representation.cacsr import CacsrData
+# from veccity.upstream.poi_representation.cacsr import CacsrData
 from veccity.utils import parse_time, cal_timeoff, ensure_dir
 import pickle
 

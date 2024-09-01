@@ -4,7 +4,7 @@ import numpy as np
 import torch
 
 from veccity.executor.base_executor import BaseExecutor
-from veccity.model import loss
+from veccity.upstream import loss
 import matplotlib as mpl
 mpl.use('Agg')
 import matplotlib.pyplot as plt

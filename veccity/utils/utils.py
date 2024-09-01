@@ -39,59 +39,59 @@ def get_model(config, data_feature):
     """
     if config['task'] == 'traj_loc_pred':
         try:
-            return getattr(importlib.import_module('veccity.model.trajectory_loc_prediction'),
+            return getattr(importlib.import_module('veccity.upstream.trajectory_loc_prediction'),
                            config['model'])(config, data_feature)
         except AttributeError:
             raise AttributeError('model is not found')
     elif config['task'] == 'traffic_state_pred':
         try:
-            return getattr(importlib.import_module('veccity.model.traffic_flow_prediction'),
+            return getattr(importlib.import_module('veccity.upstream.traffic_flow_prediction'),
                            config['model'])(config, data_feature)
         except AttributeError:
             try:
-                return getattr(importlib.import_module('veccity.model.traffic_speed_prediction'),
+                return getattr(importlib.import_module('veccity.upstream.traffic_speed_prediction'),
                                config['model'])(config, data_feature)
             except AttributeError:
                 try:
-                    return getattr(importlib.import_module('veccity.model.traffic_demand_prediction'),
+                    return getattr(importlib.import_module('veccity.upstream.traffic_demand_prediction'),
                                    config['model'])(config, data_feature)
                 except AttributeError:
                     try:
-                        return getattr(importlib.import_module('veccity.model.traffic_od_prediction'),
+                        return getattr(importlib.import_module('veccity.upstream.traffic_od_prediction'),
                                        config['model'])(config, data_feature)
                     except AttributeError:
                         try:
-                            return getattr(importlib.import_module('veccity.model.traffic_accident_prediction'),
+                            return getattr(importlib.import_module('veccity.upstream.traffic_accident_prediction'),
                                            config['model'])(config, data_feature)
                         except AttributeError:
                             raise AttributeError('model is not found')
     elif config['task'] == 'map_matching':
         try:
-            return getattr(importlib.import_module('veccity.model.map_matching'),
+            return getattr(importlib.import_module('veccity.upstream.map_matching'),
                            config['model'])(config, data_feature)
         except AttributeError:
             raise AttributeError('model is not found')
     elif config['task'] == 'road_representation':
         try:
-            return getattr(importlib.import_module('veccity.model.road_representation'),
+            return getattr(importlib.import_module('veccity.upstream.road_representation'),
                            config['model'])(config, data_feature)
         except AttributeError:
             raise AttributeError('model is not found')
     elif config['task'] == 'region_representation':
         try:
-            return getattr(importlib.import_module('veccity.model.region_representation'),
+            return getattr(importlib.import_module('veccity.upstream.region_representation'),
                            config['model'])(config, data_feature)
         except AttributeError:
             raise AttributeError('model is not found')
     elif config['task'] == 'poi_representation':
         try:
-            return getattr(importlib.import_module('veccity.model.poi_representation'),
+            return getattr(importlib.import_module('veccity.upstream.poi_representation'),
                            config['model'])(config, data_feature)
         except AttributeError:
             raise AttributeError('model is not found')
     elif config['task'] == 'eta':
         try:
-            return getattr(importlib.import_module('veccity.model.eta'),
+            return getattr(importlib.import_module('veccity.upstream.eta'),
                            config['model'])(config, data_feature)
         except AttributeError:
             raise AttributeError('model is not found')
@@ -110,7 +110,7 @@ def get_evaluator(config,data_feature):
         AbstractEvaluator: the loaded evaluator
     """
     try:
-        return getattr(importlib.import_module('veccity.evaluator'),
+        return getattr(importlib.import_module('veccity.downstream'),
                        config['evaluator'])(config,data_feature)
     except AttributeError:
         raise AttributeError('evaluator is not found')

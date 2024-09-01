@@ -3,7 +3,7 @@ import time
 import torch
 import numpy as np
 from veccity.executor.bert_executor import BertBaseExecutor
-from veccity.model import loss
+from veccity.upstream import loss
 import torch.nn.functional as F
 from tqdm import tqdm
 

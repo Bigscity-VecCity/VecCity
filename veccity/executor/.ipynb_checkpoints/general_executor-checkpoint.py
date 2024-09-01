@@ -7,7 +7,7 @@ from logging import getLogger
 from torch.utils.tensorboard import SummaryWriter
 from veccity.executor.abstract_executor import AbstractExecutor
 from veccity.utils import get_evaluator, ensure_dir
-from veccity.model import loss
+from veccity.upstream import loss
 from functools import partial
 
 

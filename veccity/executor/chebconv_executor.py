@@ -2,7 +2,7 @@ import os
 import time
 import torch
 from ray import tune
-from veccity.model import loss
+from veccity.upstream import loss
 from veccity.executor.general_executor import GeneralExecutor
 
 class ChebConvExecutor(GeneralExecutor):

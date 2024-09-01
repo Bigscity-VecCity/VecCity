@@ -1,6 +1,6 @@
 import os
 from veccity.data.dataset.traffic_representation_dataset import TrafficRepresentationDataset
-from veccity.evaluator.utils import generate_road_representaion_downstream_data
+from veccity.downstream.utils import generate_road_representaion_downstream_data
 import numpy as np
 import pandas as pd
 

@@ -6,7 +6,7 @@ import torch
 import os
 
 from veccity.executor.general_executor import GeneralExecutor
-from veccity.model import loss
+from veccity.upstream import loss
 
 
 class GEMLExecutor(GeneralExecutor):
