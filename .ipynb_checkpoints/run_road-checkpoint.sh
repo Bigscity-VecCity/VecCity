@@ -1,0 +1,2 @@
+#nohup sh run_road.sh Toast xa 0 > log/run_road_Toast_xa.log 2>&1 &
+python run_model.py --task road_representation --model $1 --dataset $2  --gpu_id $3 --config road_config_128 --exp_id $1 --train false

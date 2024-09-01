@@ -1,0 +1,16 @@
+{
+    "embed_size": 128,
+    "task_epoch": 30,
+    "embed_epoch":100,
+    "max_epoch":100,
+    "pre_len": 1,
+    "init_param": false,
+    "downstream_model": "stlstm",
+    "batch_size": 64,
+    "downstream_batch_size": 64,
+    "downstream_hidden_dim" : 512,
+    "cache": true,
+    "num_workers":3,
+    "evaluate_tasks":["tsi","sts","tte"],
+    "evaluate_models":["SpeedInferenceModel"]
+  }

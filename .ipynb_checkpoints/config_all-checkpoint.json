@@ -1,0 +1,11 @@
+{
+  "embed_size": 128,
+  "task_epoch": 200,
+  "pre_len": 3,
+  "embed_epoch": 500,
+  "init_param": false,
+  "downstream_model": "rnn",
+  "is_static": true,
+  "batch_size": 64,
+  "downstream_batch_size": 64
+}

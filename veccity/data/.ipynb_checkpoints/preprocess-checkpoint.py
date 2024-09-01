@@ -497,9 +497,6 @@ def avg_speed(config):
     print("err_geo_count", err_geo_count, '/', geo.shape[0])
     data={'index':road_id,'speed':avg_speeds}
     df=pd.DataFrame(data)
-    df=df.replace([np.inf, -np.inf], np.nan)
-    df=df.dropna()
-    df=df.drop(df.query('speed > 300').index)
     df.to_csv(cache_dir+f'/{road_name}/label_data/avg_speeds.csv',index=None)
 
 
