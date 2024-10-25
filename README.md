@@ -44,7 +44,7 @@ pip install -r ./requirements.txt
 
 ### Step 3: Download processed data:
 
-You can also follow the instraction to [download processed city data](xxxxx) or [process your own dataset](xxxxxx).
+You can also follow the instraction to [download processed city data](https://bhpan.buaa.edu.cn/link/AA904DB8317D61423995CA009146E0AF33) or process your own dataset.
 
 ### Step 4: Run a training pipeline for MapRL models:
 
@@ -55,7 +55,7 @@ python run_model.py --task poi --dataset nyc --model CTLE --exp_uid CTLE
 ## 3. Dataset Illstration
 We opensource nine city datasets in New York, Chicago, Tokyo, San Francisco, Porto, Beijing, Chendu, and Xi'an compatible with atomic files. 
 As the original dataset is quite large, we have included example data, data processing code, and model code to assist researchers in understanding our work. 
-The complete data sources can be found on [Beihang Pan](xxxxxx).
+The complete data sources can be found on [Beihang Pan](https://bhpan.buaa.edu.cn/link/AA904DB8317D61423995CA009146E0AF33).
 
 The above dataset construction scheme is highly reusable, one can prepare their own city data and use our code to build their personalized MapRL dataset easily. 
 We will provide a detailed explanation for our data and pre-processing module in the following. 
