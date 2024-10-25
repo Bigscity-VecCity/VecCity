@@ -1,0 +1,44 @@
+.DS_Store
+*.tfevents.*
+raw_data.zip
+raw_data/**/*.geo
+raw_data/**/*.srel
+raw_data/**/*.grel
+raw_data/**/*.cdtraj
+raw_data/**/*.citraj
+raw_data/**/config.json
+raw_data/**/README.md
+veccity/cache
+visualized_data
+log
+
+# Byte-compiled / optimized / DLL files
+**/__pycache__/
+*$py.class
+
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+test
+.pytest_cache/
+
+.ipynb_checkpoints
+
+
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/

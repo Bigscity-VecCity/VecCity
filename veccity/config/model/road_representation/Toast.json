@@ -1,0 +1,17 @@
+{
+    "representation_object": "road",
+    "max_epoch":10,
+    "hidden_dim":128,
+    "ff_dim":128,
+    "layers":2,
+    "n_heads":4,
+    "load_init": true,
+    "w2v_lr":0.1,
+    "max_len":150,
+    "p_dropout":0.1,
+    "num_walks":30,
+    "embedding_size":128,
+    "lr":0.0005,
+    "mode":0,
+    "output_dim":128
+}

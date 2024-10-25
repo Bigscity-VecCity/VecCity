@@ -1,0 +1,15 @@
+{
+    "batch_size":1024,
+    "max_epoch":22,
+    "representation_object":"road",
+    "learning_rate":1e-3,
+    "embed_dim":128,
+    "output_dim":128,
+    "lamb":0.1,
+    "gama":1.0,
+    "sampling":"uniform",
+    "layer_num":4,
+    "agg":"mean",
+    "with_p":"True",
+    "weight_decay":1e-5
+}

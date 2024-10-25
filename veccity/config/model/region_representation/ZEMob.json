@@ -1,0 +1,10 @@
+{
+  "MaxGen": 200,
+  "NIND": 50,
+  "output_dim": 128,
+  "max_epoch": 2000,
+  "batch_size": 64,
+  "learning_rate": 0.001,
+  "representation_object":"region",
+  "remove_node_type": "non_zero"
+}

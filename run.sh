@@ -1,0 +1,1 @@
+python run_model.py --task region_representation --model HREP --dataset xa  --gpu_id 0 --exp_id HREP --train false

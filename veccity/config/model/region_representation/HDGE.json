@@ -1,0 +1,10 @@
+{
+  "output_dim": 128,
+  "is_directed": true,
+  "num_walks": 30,
+  "window_size": 10,
+  "num_workers": 10,
+  "max_epoch": 10,
+  "representation_object":"region",
+  "remove_node_type": "od"
+}

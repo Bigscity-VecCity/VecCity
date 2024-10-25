@@ -1,0 +1,12 @@
+{
+    "representation_object": "road",
+    "output_dim": 128,
+    "is_directed": false,
+    "num_walks": 10,
+    "walk_length": 80,
+    "window_size": 10,
+    "num_workers": 10,
+    "max_epoch": 1,
+    "alpha": 0.0,
+    "seed": 0
+}

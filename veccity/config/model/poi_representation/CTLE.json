@@ -1,0 +1,14 @@
+{
+  "encoding_type": "positional",
+  "num_layers": 4,
+  "num_heads": 8,
+  "mask_prop": 0.2,
+  "detach": false,
+  "objective": "mh",
+  "static": false,
+  "lr_decay": false,
+  "learning_rate": 1e-4,
+  "is_static": false,
+  "embed_epoch":20,
+  "embed_size":128
+}

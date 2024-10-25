@@ -1,0 +1,181 @@
+{
+    "road_representation": {
+        "allowed_model": [
+            "ChebConv", "LINE", "GAT", "Node2Vec", "DeepWalk", "GeomGCN","JCLRNT","SRN2Vec","HyperRoad","SARN","Toast","START","HRNR"
+        ],
+        "allowed_dataset": [
+            "xa","bj","cd"
+        ],
+        "ChebConv": {
+            "dataset_class": "ChebConvDataset",
+            "executor": "ChebConvExecutor",
+            "evaluator": "HHGCLEvaluator"
+        },
+        "GeomGCN": {
+            "dataset_class": "ChebConvDataset",
+            "executor": "ChebConvExecutor",
+            "evaluator": "HHGCLEvaluator"
+        },
+        "GAT": {
+            "dataset_class": "ChebConvDataset",
+            "executor": "ChebConvExecutor",
+            "evaluator": "HHGCLEvaluator"
+        },
+        "Node2Vec": {
+            "dataset_class": "RoadNetWorkDataset",
+            "executor": "TwoStepExecutor",
+            "evaluator": "HHGCLEvaluator"
+        },
+        "DeepWalk": {
+            "dataset_class": "RoadNetWorkDataset",
+            "executor": "TwoStepExecutor",
+            "evaluator": "HHGCLEvaluator"
+        },
+        "LINE": {
+            "dataset_class": "LINEDataset",
+            "executor": "LINEExecutor",
+            "evaluator": "HHGCLEvaluator"
+        },
+        "SRN2Vec": {
+            "dataset_class": "SRN2VecDataset",
+            "executor": "TwoStepExecutor",
+            "evaluator": "HHGCLEvaluator"
+        },
+        "JCLRNT": {
+            "dataset_class": "JCLRNTDataset",
+            "executor": "LineSeqExecutor",
+            "evaluator": "LineSeqEvaluator"
+        },
+        "Toast": {
+            "dataset_class": "ToastDataset",
+            "executor": "LineSeqExecutor",
+            "evaluator": "LineSeqEvaluator"
+        },
+        "HyperRoad": {
+            "dataset_class": "HyperRoadDataset",
+            "executor": "TwoStepExecutor",
+            "evaluator": "HHGCLEvaluator"
+        },
+        "SARN": {
+            "dataset_class": "HyperRoadDataset",
+            "executor": "TwoStepExecutor",
+            "evaluator": "HHGCLEvaluator"
+        },
+        "START":{
+            "dataset_class": "STARTDataset",
+            "executor": "ContrastiveMLMExecutor",
+            "evaluator": "LineSeqEvaluator"
+        },
+        "HRNR":{
+            "dataset_class": "HRNRDataset",
+            "executor": "TwoStepExecutor",
+            "evaluator": "HHGCLEvaluator"
+        }
+    },
+    "region_representation": {
+        "allowed_model": [
+            "Node2Vec","HDGE","MGFN","LINE","ZEMob","MVURE","GMEL","ReMVC","HREP"
+        ],
+        "allowed_dataset": [
+            "xa","cd","bj"
+        ],
+         "Node2Vec": {
+            "dataset_class": "Node2VecDataset",
+            "executor": "TwoStepExecutor",
+            "evaluator": "HHGCLEvaluator"
+        },
+        "HDGE": {
+            "dataset_class": "HDGEDataset",
+            "executor": "TwoStepExecutor",
+            "evaluator": "HHGCLEvaluator"
+        },
+        "MGFN": {
+            "dataset_class": "MGFNDataset",
+            "executor": "TwoStepExecutor",
+            "evaluator": "HHGCLEvaluator"
+        },
+        "LINE": {
+            "dataset_class": "LINERegionDataset",
+            "executor": "LINEExecutor",
+            "evaluator": "HHGCLEvaluator"
+        },
+        "ZEMob": {
+            "dataset_class": "ZEMobDataset",
+            "executor": "TwoStepExecutor",
+            "evaluator": "HHGCLEvaluator"
+        },
+        "MVURE": {
+            "dataset_class": "MVUREDataset",
+            "executor": "TwoStepExecutor",
+            "evaluator": "HHGCLEvaluator"
+        },
+        "GMEL": {
+            "dataset_class": "GMELDataset",
+            "executor": "TwoStepExecutor",
+            "evaluator": "HHGCLEvaluator"
+        },
+        "ReMVC": {
+            "dataset_class": "ReMVCDataset",
+            "executor": "TwoStepExecutor",
+            "evaluator": "HHGCLEvaluator"
+        },
+        "HREP": {
+            "dataset_class": "HREPDataset",
+            "executor": "TwoStepExecutor",
+            "evaluator": "HHGCLEvaluator"
+        }
+    },
+    "poi_representation": {
+        "allowed_model": [
+            "CTLE", "DownstreamEmbed", "SkipGram", "CBOW", "Tale", "Teaser", "POI2Vec", "Hier","CACSR"
+        ],
+        "allowed_dataset": [
+            "foursquare_nyc", "foursquare_tky", "brightkite", "gowalla"
+        ],
+        "CTLE": {
+            "dataset_class": "POIRepresentationDataset",
+            "executor": "POIRepresentationExecutor",
+            "evaluator": "POIRepresentationEvaluator"
+        },
+        "DownstreamEmbed": {
+            "dataset_class": "POIRepresentationDataset",
+            "executor": "POIRepresentationExecutor",
+            "evaluator": "POIRepresentationEvaluator"
+        },
+        "SkipGram": {
+            "dataset_class": "POIRepresentationDataset",
+            "executor": "POIRepresentationExecutor",
+            "evaluator": "POIRepresentationEvaluator"
+        },
+        "CBOW": {
+            "dataset_class": "POIRepresentationDataset",
+            "executor": "POIRepresentationExecutor",
+            "evaluator": "POIRepresentationEvaluator"
+        },
+        "Tale": {
+            "dataset_class": "POIRepresentationDataset",
+            "executor": "POIRepresentationExecutor",
+            "evaluator": "POIRepresentationEvaluator"
+        },
+        "Teaser": {
+            "dataset_class": "POIRepresentationDataset",
+            "executor": "POIRepresentationExecutor",
+            "evaluator": "POIRepresentationEvaluator"
+        },
+        "POI2Vec": {
+            "dataset_class": "POIRepresentationDataset",
+            "executor": "POIRepresentationExecutor",
+            "evaluator": "POIRepresentationEvaluator"
+        },
+        "Hier": {
+            "dataset_class": "POIRepresentationDataset",
+            "executor": "POIRepresentationExecutor",
+            "evaluator": "POIRepresentationEvaluator"
+        },
+        "CACSR": {
+            "dataset_class": "POIRepresentationDataset",
+            "executor": "POIRepresentationExecutor",
+            "evaluator": "POIRepresentationEvaluator"
+        }
+    }
+}

@@ -1,0 +1,9 @@
+{
+  "con": 1e9,
+  "indi_context": false,
+  "learner": "sparse_adam",
+  "learning_rate": 1e-3,
+  "is_static": true,
+  "embed_size":128,
+  "embed_epoch":150
+}

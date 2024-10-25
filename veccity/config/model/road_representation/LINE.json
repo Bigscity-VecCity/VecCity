@@ -1,0 +1,11 @@
+{
+    "representation_object": "road",
+    "order": "second",
+    "output_dim": 32,
+    "max_epoch": 1,
+    "learner": "asgd",
+    "learning_rate": 0.001,
+    "lr_decay": true,
+    "lr_scheduler": "reducelronplateau",
+    "lr_decay_ratio": 0.7
+}
