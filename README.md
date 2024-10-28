@@ -2,7 +2,7 @@
     <img src="./figures/VecCity.png" width="440px">
     <p> 
     	<b>
-        A Taxonomy-Based Library for Electronic Map Entity Representation Learning <a href="https://arxiv.org/pdf/2306.11443.pdf" title="PDF">PDF</a>
+        A Taxonomy-guided Library for Map Entity Representation Learning
         </b>
     </p>
 
@@ -225,7 +225,7 @@ VecCity
 If you find our work is useful for your research, please consider citing:
 ```bash
 @article{zhang2024vec,
-  title={VecCity: A Taxonomy-Based Library for Electronic Map Entity Representation Learning},
+  title={VecCity: A Taxonomy-guided Library for Map Entity Representation Learning},
   author={Zhang, Wentao and Wang, jingyuan and U, Leonhou},
   journal={arxiv},
   year={2024}
