@@ -18,7 +18,7 @@
 </p>
 </div>
 
-Official repository of under review paper ["*VecCity*: A Taxonomy-Based Library for Electronic Map Entity Representation Learning"](https://arxiv.org/pdf/2306.11443.pdf). Please star, watch and fork our repo for the active updates!
+Official repository of under review paper "*VecCity*: A Taxonomy-guided Library for Map Entity Representation Learning". Please star, watch and fork our repo for the active updates!
 
 ## 1. Overview
 <div align="center">
