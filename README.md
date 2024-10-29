@@ -206,12 +206,12 @@ VecCity
  |    |-- upstream  # dir for upstream module where stores the scripts for upstream models
  |    |-- utils  # dir for utils where stores the scripts of useful tools
  |-- raw_data
- |    |-- porto
- |    |    |-- porto.geo
- |    |    |-- porto.grel
- |    |    |-- porto.srel
- |    |    |-- porto.citraj
- |    |    |-- porto.cdtraj
+ |    |-- prt
+ |    |    |-- prt.geo
+ |    |    |-- prt.grel
+ |    |    |-- prt.srel
+ |    |    |-- prt.citraj
+ |    |    |-- prt.cdtraj
  |    |    |-- config.json
  |    |-- ...
  |-- log  # dir for log
