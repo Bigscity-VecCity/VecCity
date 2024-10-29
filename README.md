@@ -62,17 +62,17 @@ We will provide a detailed explanation for our data and pre-processing module in
 
 #### 3.1 City Data
 
-| City | #POI  | #Segment | #Parcel | #CIT | #CDT  | #OD Flow |
+| City | #POI  | #Segment | #Parcel | #CIT | #CDT  | #OD|
 | :-- | --: | --: | --: | --: | --: | --: |
-|NY|10,283|90,781|262|309,523|-|14,385,456|
-|CHI|3,659|47,701|77|444,581|-|759,788|
-|TYO|7,863|407,905|64|107,131|226,782|-|
-|SIN|9,816|35,084|332|477,133|11,170|-|
-|PRT|1,228|11,095|382|11,272|695,085|4014|
-|SF|1,617|27,274|194|37,336|500,516|23,344|
-|BJ|81,181|40,306|11,208|-|1,018,312|575,660|
-|CD|17,301|6,195|1,306|-|559,729|111,642|
-|XA|19,108|5,269|1,056|-|384,618|78,907|
+| NY  | 79,627 | 90,781  | 262    | 823,853  | -         | 28,189 |
+| CHI | 28,141 | 47,669  | 77     | 279,183  | -         | 4,631  |
+| TYO | 61,858 | 407,905 | 64     | 573,703  | 226,782   | -      |
+| SIN | 75,329 | 35,084  | 332    | 827,828  | 11,170    | -      |
+| PRT | 4,521  | 11,095  | 382    | 19,402   | 695,085   | 324    |
+| SF  | 15,674 | 27,274  | 194    | 171,873  | 500,516   | 24,716 |
+| BJ  | 81,181 | 40,306  | 11,208 | -        | 1,018,312 | 687,890|
+| CD  | 17,301 | 6,195   | 1,306  | -        | 559,729   | 64,482 |
+| XA  | 19,108 | 5,269   | 1,056  | -        | 384,618   | 54,365 |
 
 
 We store the original unprocessed files in the [Beihang Pan](xxxx). To preprocess, align, and filter these files, we utilize the scripts provided by [VecCity-Dataset].  After proprocessing, the original dataset will be storaged in atomic files.
