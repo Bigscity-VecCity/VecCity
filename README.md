@@ -75,7 +75,7 @@ We will provide a detailed explanation for our data and pre-processing module in
 | XA  | 19,108 | 5,269   | 1,056  | -        | 384,618   | 54,365 |
 
 
-We store the original unprocessed files in the [Beihang Pan](xxxx). To preprocess, align, and filter these files, we utilize the scripts provided by [VecCity-Dataset].  After proprocessing, the original dataset will be storaged in atomic files.
+We store the original unprocessed files in the [Beihang Pan](https://bhpan.buaa.edu.cn/link/AA904DB8317D61423995CA009146E0AF33) (You can find the detail of preprocess in README file which is placed in the city dataset dir).  After proprocessing, the original dataset will be storaged in atomic files.
 Our city dataset construction scheme is highly reusable. You can prepare your own data following either the file format in *atomic files*. This flexibility allows you to adapt the construction process to various cities and datasets easily.
 
 
