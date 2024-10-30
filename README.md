@@ -128,7 +128,7 @@ entity_id: The field indicates the map entity to which a sample corresponds, wit
 timestamp: The field stores a trajectory sample's timestamp, which is in the format of Unix timestamps.
 ```
 
-**xxx.config**: The config file is used to supplement the settings for data preprocessing.
+**config.json**: The config file is used to supplement the settings for data preprocessing.
 
 
 ## 4. How to Run
