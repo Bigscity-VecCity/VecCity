@@ -2,7 +2,7 @@
     <img src="./figures/VecCity.png" width="440px">
     <p> 
     	<b>
-        A Taxonomy-Based Library for Electronic Map Entity Representation Learning <a href="https://arxiv.org/pdf/2306.11443.pdf" title="PDF">PDF</a>
+        A Taxonomy-guided Library for Map Entity Representation Learning
         </b>
     </p>
 
@@ -18,7 +18,7 @@
 </p>
 </div>
 
-Official repository of under review paper ["*VecCity*: A Taxonomy-Based Library for Electronic Map Entity Representation Learning"](https://arxiv.org/pdf/2306.11443.pdf). Please star, watch and fork our repo for the active updates!
+Official repository of under review paper "*VecCity*: A Taxonomy-guided Library for Map Entity Representation Learning". Please star, watch and fork our repo for the active updates!
 
 ## 1. Overview
 <div align="center">
@@ -44,7 +44,7 @@ pip install -r ./requirements.txt
 
 ### Step 3: Download processed data:
 
-You can also follow the instraction to [download processed city data](xxxxx) or [process your own dataset](xxxxxx).
+You can also follow the instraction to [download processed city data](https://bhpan.buaa.edu.cn/link/AA904DB8317D61423995CA009146E0AF33) or process your own dataset.
 
 ### Step 4: Run a training pipeline for MapRL models:
 
@@ -55,27 +55,27 @@ python run_model.py --task poi --dataset nyc --model CTLE --exp_uid CTLE
 ## 3. Dataset Illstration
 We opensource nine city datasets in New York, Chicago, Tokyo, San Francisco, Porto, Beijing, Chendu, and Xi'an compatible with atomic files. 
 As the original dataset is quite large, we have included example data, data processing code, and model code to assist researchers in understanding our work. 
-The complete data sources can be found on [Beihang Pan](xxxxxx).
+The complete data sources can be found on [Beihang Pan](https://bhpan.buaa.edu.cn/link/AA904DB8317D61423995CA009146E0AF33).
 
 The above dataset construction scheme is highly reusable, one can prepare their own city data and use our code to build their personalized MapRL dataset easily. 
 We will provide a detailed explanation for our data and pre-processing module in the following. 
 
 #### 3.1 City Data
 
-| City | #POI  | #Segment | #Parcel | #CIT | #CDT  | #OD Flow |
+| City | #POI  | #Segment | #Parcel | #CIT | #CDT  | #OD|
 | :-- | --: | --: | --: | --: | --: | --: |
-|NY|10,283|90,781|262|309,523|-|14,385,456|
-|CHI|3,659|47,701|77|444,581|-|759,788|
-|TYO|7,863|407,905|64|107,131|226,782|-|
-|SIN|9,816|35,084|332|477,133|11,170|-|
-|PRT|1,228|11,095|382|11,272|695,085|4014|
-|SF|1,617|27,274|194|37,336|500,516|23,344|
-|BJ|81,181|40,306|11,208|-|1,018,312|575,660|
-|CD|17,301|6,195|1,306|-|559,729|111,642|
-|XA|19,108|5,269|1,056|-|384,618|78,907|
+| NY  | 79,627 | 90,781  | 262    | 823,853  | -         | 28,189 |
+| CHI | 28,141 | 47,669  | 77     | 279,183  | -         | 4,631  |
+| TYO | 61,858 | 407,905 | 64     | 573,703  | 226,782   | -      |
+| SIN | 75,329 | 35,084  | 332    | 827,828  | 11,170    | -      |
+| PRT | 4,521  | 11,095  | 382    | 19,402   | 695,085   | 324    |
+| SF  | 15,674 | 27,274  | 194    | 171,873  | 500,516   | 24,716 |
+| BJ  | 81,181 | 40,306  | 11,208 | -        | 1,018,312 | 687,890|
+| CD  | 17,301 | 6,195   | 1,306  | -        | 559,729   | 64,482 |
+| XA  | 19,108 | 5,269   | 1,056  | -        | 384,618   | 54,365 |
 
 
-We store the original unprocessed files in the [Beihang Pan](xxxx). To preprocess, align, and filter these files, we utilize the scripts provided by [VecCity-Dataset].  After proprocessing, the original dataset will be storaged in atomic files.
+We store the original unprocessed files in the [Beihang Pan](https://bhpan.buaa.edu.cn/link/AA904DB8317D61423995CA009146E0AF33) (You can find the detail of preprocess in README file which is placed in the city dataset dir).  After proprocessing, the original dataset will be storaged in atomic files.
 Our city dataset construction scheme is highly reusable. You can prepare your own data following either the file format in *atomic files*. This flexibility allows you to adapt the construction process to various cities and datasets easily.
 
 
@@ -206,12 +206,12 @@ VecCity
  |    |-- upstream  # dir for upstream module where stores the scripts for upstream models
  |    |-- utils  # dir for utils where stores the scripts of useful tools
  |-- raw_data
- |    |-- porto
- |    |    |-- porto.geo
- |    |    |-- porto.grel
- |    |    |-- porto.srel
- |    |    |-- porto.citraj
- |    |    |-- porto.cdtraj
+ |    |-- prt
+ |    |    |-- prt.geo
+ |    |    |-- prt.grel
+ |    |    |-- prt.srel
+ |    |    |-- prt.citraj
+ |    |    |-- prt.cdtraj
  |    |    |-- config.json
  |    |-- ...
  |-- log  # dir for log
@@ -225,7 +225,7 @@ VecCity
 If you find our work is useful for your research, please consider citing:
 ```bash
 @article{zhang2024vec,
-  title={VecCity: A Taxonomy-Based Library for Electronic Map Entity Representation Learning},
+  title={VecCity: A Taxonomy-guided Library for Map Entity Representation Learning},
   author={Zhang, Wentao and Wang, jingyuan and U, Leonhou},
   journal={arxiv},
   year={2024}
