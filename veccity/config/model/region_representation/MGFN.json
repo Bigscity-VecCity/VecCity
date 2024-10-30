@@ -2,6 +2,5 @@
   "output_dim": 128,
   "representation_object":"region",
   "learning_rate":0.0001,
-  "max_epoch": 10,
   "device": "cpu"
 }

@@ -87,8 +87,6 @@ class HREPDataset(MVUREDataset):
         return edge_index
 
     def get_data_feature(self):
-        if not need_train(self.config):
-            return {}
         poi_edge_index = self.create_graph(self.poi_similarity, self.importance_k)
         s_edge_index = self.create_graph(self.s_adj, self.importance_k)
         d_edge_index = self.create_graph(self.d_adj, self.importance_k)

@@ -9,6 +9,6 @@
   "lr_decay": false,
   "learning_rate": 1e-4,
   "is_static": false,
-  "embed_epoch":20,
+  "embed_epoch":150,
   "embed_size":128
 }

@@ -1,6 +1,6 @@
 {
     "batch_size":1024,
-    "max_epoch":22,
+    "max_epoch":100,
     "representation_object":"road",
     "learning_rate":1e-3,
     "embed_dim":128,

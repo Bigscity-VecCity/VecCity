@@ -17,8 +17,6 @@ class MGFNDataset(AbstractDataset):
     def __init__(self,config):
         self.config = config
         preprocess_all(config)
-        if not need_train(config):
-            return
         self._logger = getLogger()
         self.dataset = self.config.get('dataset', '')
         self.data_path = './raw_data/' + self.dataset + '/'
@@ -34,8 +32,6 @@ class MGFNDataset(AbstractDataset):
         self.od_label_path = os.path.join(cache_dir, self.dataset, 'od_region_train_od.npy')
         self.mob_adj = np.load(self.od_label_path)
         self.num_regions = self.mob_adj.shape[0]
-        import pdb
-        pdb.set_trace()
         self.num_nodes = self.num_regions
 
         if os.path.exists(self.mob_patterns_path):
@@ -223,8 +219,6 @@ class MGFNDataset(AbstractDataset):
         return mob_patterns, cluster_label
 
     def get_data_feature(self):
-        if not need_train(self.config):
-            return {}
         """
         返回一个 dict，包含数据集的相关特征
 

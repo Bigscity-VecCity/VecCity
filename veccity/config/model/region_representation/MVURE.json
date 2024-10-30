@@ -1,6 +1,5 @@
 {
   "output_dim": 128,
   "representation_object":"region",
-  "remove_node_type":"MVURE",
-  "max_epoch": 2000
+  "remove_node_type":"MVURE"
 }

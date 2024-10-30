@@ -34,8 +34,6 @@ class MVUREDataset(AbstractDataset):
     def __init__(self, config):
         self.config = config
         preprocess_all(config)
-        if not need_train(config):
-            return
         self._logger = getLogger()
         self.dataset = self.config.get('dataset', '')
         self.data_path = './raw_data/' + self.dataset + '/'

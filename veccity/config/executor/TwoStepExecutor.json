@@ -1,5 +1,4 @@
 {
     "output_dim": 128,
-    "max_epoch": 10,
-    "evaluate_tasks": ["classify", "od", "flow"]
+    "max_epoch": 100
 }

@@ -118,7 +118,7 @@ class SARN(AbstractReprLearningModel):
         assert sum(filter(lambda x: x < 0, self.seg_idx_to_cellid)) == 0
 
 
-    def run(self,data=None):
+    def run(self,data=None,test_data=None):
         if not self.config.get('train') and os.path.exists(self.road_embedding_path):
             return
         training_starttime = time.time()

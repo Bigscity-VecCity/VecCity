@@ -1,5 +1,5 @@
 {
     "representation_object": "road",
-    "max_epoch": 5,
-    "output_dim": 32
+    "max_epoch": 100,
+    "output_dim": 128
 }

@@ -51,7 +51,7 @@ class HyperRoad(AbstractReprLearningModel):
     def forward(self, batch):
         return self.model(batch)
     
-    def run(self, data=None):
+    def run(self, data=None,test_data=None):
         if not self.config.get('train') and os.path.exists(self.road_embedding_path):
             return
         start_time = time.time()

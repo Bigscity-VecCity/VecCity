@@ -6,7 +6,7 @@ tqdm
 networkx
 geopandas
 faiss-cpu
-scikit-learn
+scikit-learn=1.0.2
 seaborn
 geatpy=2.7.0
 numpy=1.25

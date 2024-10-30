@@ -19,8 +19,6 @@ class ReMVCDataset(TrafficRepresentationDataset):
     def __init__(self, config):
         self.config = config
         preprocess_all(config)
-        if not need_train(config):
-            return
         super().__init__(config)
         self.data_cache_file = f'./veccity/cache/dataset_cache/{self.dataset}/ReMVC'
         ensure_dir(self.data_cache_file)
@@ -188,8 +186,6 @@ class ReMVCDataset(TrafficRepresentationDataset):
         return None, None, None
 
     def get_data_feature(self):
-        if not need_train(self.config):
-            return {}
         function = np.zeros(self.num_regions)
         region_df = self.geofile[self.geofile['traffic_type'] == 'region']
         for i, row in region_df.iterrows():

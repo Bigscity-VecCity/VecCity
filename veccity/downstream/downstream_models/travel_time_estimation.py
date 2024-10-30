@@ -129,9 +129,10 @@ class TravelTimeEstimationModel(AbstractModel):
         eval_dataset = TimeEstimationDataset(eval_data_X,eval_lens,eval_data_y)
         test_dataset = TimeEstimationDataset(test_data_X,test_lens,test_data_y)
 
-        if self.choice:
-            train_dataset=random.choices(train_dataset,k=self.choice)
-            print(f'do random choice {self.choice}')
+        # just for test
+        # if self.choice:
+        #     train_dataset=random.choices(train_dataset,k=self.choice)
+        #     print(f'do random choice {self.choice}')
 
 
         train_dataloader= DataLoader(train_dataset,batch_size=128,shuffle=True,num_workers=4)

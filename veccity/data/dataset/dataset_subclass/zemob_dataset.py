@@ -16,8 +16,6 @@ class ZEMobDataset(AbstractDataset):
         self.config = config
         preprocess_all(config)
         self._logger = getLogger()
-        if not need_train(config):
-            return
         self.dataset = self.config.get('dataset', '')
         self.device = config.get('device', torch.device('cpu'))
         self.od_label_path = os.path.join(cache_dir, self.dataset, 'od_region_train_od.npy')
@@ -311,8 +309,6 @@ class ZEMobDataset(AbstractDataset):
         Returns:
             dict: 包含数据集的相关特征的字典
         """
-        if not need_train(self.config):
-            return {}
         return {'ppmi_matrix': self.ppmi_matrix, 'G_matrix': self.G_matrix, 
                 'region_num': self.zone_num, 'mobility_event_num': self.mobility_event_num}
 

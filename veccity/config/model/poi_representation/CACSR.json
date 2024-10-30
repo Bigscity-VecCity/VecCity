@@ -23,5 +23,5 @@
     "max_grad_norm": 5.0,
     "learning_rate":1e-3,
     "is_static":false,
-    "embed_epoch":50
+    "embed_epoch":150
 }

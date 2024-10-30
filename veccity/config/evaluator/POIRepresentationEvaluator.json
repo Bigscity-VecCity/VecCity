@@ -1,3 +1,4 @@
 {
-  
+  "embed_epoch":10,
+  "embed_size":128
 }

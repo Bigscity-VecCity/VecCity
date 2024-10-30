@@ -128,9 +128,9 @@ class TrafficRepresentationDataset(AbstractDataset):
         """
         geofile = pd.read_csv(self.data_path + self.geo_file + '.geo')
         self.geofile = geofile
-        coordinates_list = geofile[geofile['traffic_type'] == 'region']['coordinates']
-        l = coordinates_list if coordinates_list[0][0].isalpha() else [geojson2geometry(coordinate) for coordinate in coordinates_list]
-        self.region_geometry = gpd.GeoSeries.from_wkt(l)
+        coordinates_list = geofile[geofile['traffic_type'] == 'region']['region_geometry']
+        # l = coordinates_list if coordinates_list[0][0].isalpha() else [geojson2geometry(coordinate) for coordinate in coordinates_list]
+        self.region_geometry = gpd.GeoSeries.from_wkt(coordinates_list)
         self.geo_ids = list(geofile['geo_id'])
         self.region_ids = list(geofile[geofile['traffic_type'] == 'region']['geo_id'])
         self.num_regions = len(self.region_ids)

@@ -9,8 +9,10 @@ raw_data/**/*.citraj
 raw_data/**/config.json
 raw_data/**/README.md
 veccity/cache
+script
 visualized_data
 log
+raw_data/*
 
 # Byte-compiled / optimized / DLL files
 **/__pycache__/

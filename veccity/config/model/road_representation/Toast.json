@@ -1,6 +1,6 @@
 {
     "representation_object": "road",
-    "max_epoch":10,
+    "max_epoch":100,
     "hidden_dim":128,
     "ff_dim":128,
     "layers":2,

@@ -278,7 +278,11 @@ def save_od_od_matrix(data_dir, file_name, n):
         for _, row in od_df.iterrows():
             origin = int(row['origin_id'])
             destination = int(row['destination_id'])
-            od_matrix[origin][destination] += 1
+            if "prt" in data_dir:
+                # ps:porto数据集的数值比较大，为了和其他数据集保持一直，我们对其OD数据进行了除10操作
+                od_matrix[origin][destination] += 0.1
+            else:
+                od_matrix[origin][destination] += 1
         np.save(file_path, od_matrix)
 
 
@@ -340,7 +344,6 @@ class preprocess_od(PreProcess):
                 test_df = df.drop(train_df.index)
                 train_df.to_csv(train_file, index=False)
                 test_df.to_csv(test_file, index=False)
-
         file_path_train = os.path.join(self.data_dir, 'od_region_train_od.npy')
         file_path_test = os.path.join(self.data_dir, 'od_region_test_od.npy')
         if not os.path.exists(file_path_train) or not os.path.exists(file_path_test):
