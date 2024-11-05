@@ -2,7 +2,7 @@
     <img src="./figures/VecCity.png" width="440px">
     <p> 
     	<b>
-        A Taxonomy-guided Library for Map Entity Representation Learning[[pdf]](https://arxiv.org/abs/2411.00874)
+        A Taxonomy-guided Library for Map Entity Representation Learning
         </b>
     </p>
 
@@ -14,7 +14,8 @@
   <a href="#3-dataset-illstration">Dataset Illstration</a> •
   <a href="#4-how-to-run">How to Run</a> •
   <a href="#5-directory-structure">Directory Structure</a> •
-  <a href="#6-citation">Citation</a> 
+  <a href="#6-citation">Citation</a> •
+  <a href="https://arxiv.org/abs/2411.00874" title="arxiv">arXiv</a>
 </p>
 </div>
 
