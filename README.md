@@ -227,7 +227,7 @@ If you find our work is useful for your research, please consider citing:
 ```bash
 @article{zhang2024vec,
   title={VecCity: A Taxonomy-guided Library for Map Entity Representation Learning},
-  author={Zhang, Wentao and Wang, jingyuan and U, Leonhou},
+  author={Zhang, Wentao and Wang, jingyuan and Yang, Yifan and U, Leonhou},
   journal={arxiv},
   year={2024}
 }
