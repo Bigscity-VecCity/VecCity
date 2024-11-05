@@ -2,7 +2,7 @@
     <img src="./figures/VecCity.png" width="440px">
     <p> 
     	<b>
-        A Taxonomy-guided Library for Map Entity Representation Learning
+        A Taxonomy-guided Library for Map Entity Representation Learning[[pdf]](https://arxiv.org/abs/2411.00874)
         </b>
     </p>
 
