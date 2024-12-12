@@ -431,7 +431,7 @@ class POIRepresentationDataset(AbstractDataset):
         self.num_loc=len(loc_index_map)
         assert len(loc_index_map) == self.coor_df.shape[0]
         
-        for user_index in self.res:
+        for user_index in self.res:            
             lens=len(self.res[user_index])
             train_lens=int((1-self.test_scale)*lens)
             
@@ -593,6 +593,8 @@ class POIRepresentationDataset(AbstractDataset):
         if cut_method == 'time_interval':
             # 按照时间窗口进行切割
             for user_index, group in traj.groupby(['user_index']):
+                if type(user_index)==tuple:
+                    user_index=user_index[0]
                 sessions = []  # 存放该用户所有的 session
                 session = []  # 单条轨迹
                 lens=group.shape[0]

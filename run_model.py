@@ -12,7 +12,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     # 增加指定的参数
     parser.add_argument('--task', type=str,
-                        default='poi_representation', help='the name of task')
+                        default='poi', help='the name of task')
     parser.add_argument('--model', type=str,
                         default='CTLE', help='the name of model')
     parser.add_argument('--dataset', type=str,

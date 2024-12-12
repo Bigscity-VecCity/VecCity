@@ -1,6 +1,6 @@
 torch>=1.8.1
 pandas=1.4
-dgl==0.6.1
+dgl-cu111==0.6.1
 torch-geometric
 tqdm
 networkx

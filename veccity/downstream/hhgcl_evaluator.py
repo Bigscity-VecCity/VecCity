@@ -433,21 +433,21 @@ class HHGCLEvaluator(AbstractEvaluator):
                 result = downstream_model.run(emb, label)
                 self.result.update(add_prefix_to_keys(result, task + '_'))
             
-            if 'flow' in evaluate_tasks:
+            if 'FI' in evaluate_tasks:
                 mae, rmse, r2, mape = self._valid_flow(emb)
                 self.result['mae'] = [mae]
                 self.result['rmse'] = [rmse]
                 self.result['mape'] = [mape]
                 self.result['r2'] = [r2]
 
-            if 'od' in evaluate_tasks:
+            if 'MI' in evaluate_tasks:
                 bilinear_mae,bilinear_rmse,bilinear_r2,bilinear_mape = self._valid_flow_using_bilinear(emb)
                 self.result['bilinear_mae'] = [bilinear_mae]
                 self.result['bilinear_rmse'] = [bilinear_rmse]
                 self.result['bilinear_mape'] = [bilinear_mape]
                 self.result['bilinear_r2'] = [bilinear_r2]
 
-            if 'classify' in evaluate_tasks:
+            if 'LPC' in evaluate_tasks:
                 if self.config.get(f'{self.representation_object}_clf_label', None) is not None:
                     self._logger.warning(f'Evaluating {self.representation_object} Classification')
                     y_truth,useful_index,micro_f1, macro_f1 = self._valid_clf(emb)
