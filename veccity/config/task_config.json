@@ -1,5 +1,5 @@
 {
-    "road_representation": {
+    "segment": {
         "allowed_model": [
             "ChebConv", "LINE", "GAT", "Node2Vec", "DeepWalk", "GeomGCN","JCLRNT","SRN2Vec","HyperRoad","SARN","Toast","START","HRNR"
         ],
@@ -72,7 +72,7 @@
             "evaluator": "HHGCLEvaluator"
         }
     },
-    "region_representation": {
+    "parcel": {
         "allowed_model": [
             "Node2Vec","HDGE","MGFN","LINE","ZEMob","MVURE","GMEL","ReMVC","HREP"
         ],
@@ -125,7 +125,7 @@
             "evaluator": "HHGCLEvaluator"
         }
     },
-    "poi_representation": {
+    "poi": {
         "allowed_model": [
             "CTLE", "DownstreamEmbed", "SkipGram", "CBOW", "Tale", "Teaser", "POI2Vec", "Hier","CACSR"
         ],

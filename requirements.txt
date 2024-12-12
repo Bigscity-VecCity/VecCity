@@ -9,7 +9,7 @@ faiss-cpu
 scikit-learn=1.0.2
 seaborn
 geatpy=2.7.0
-numpy=1.25
+numpy=1.23.4
 geopy
 dgl-cu111=0.6.1
 gensim
