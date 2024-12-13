@@ -13,5 +13,7 @@
     "embedding_size":128,
     "lr":0.0005,
     "mode":0,
-    "output_dim":128
+    "output_dim":128,
+    "evaluate_tasks":["tte","tsi", "sts"],
+    "evaluate_models":["TravelTimeEstimationModel","SpeedInferenceModel","SimilaritySearchModel"]
 }

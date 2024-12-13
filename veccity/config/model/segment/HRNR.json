@@ -57,5 +57,7 @@
     "g2t_epoch": 1000,
     "label_epoch": 20,
 
-    "baseline_gat_layer": 1
+    "baseline_gat_layer": 1,
+    "evaluate_tasks":["tte","tsi", "sts"],
+    "evaluate_models":["TravelTimeEstimationModel","SpeedInferenceModel","SimilaritySearchModel"]
 }

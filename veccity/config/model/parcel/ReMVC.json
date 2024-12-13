@@ -10,5 +10,6 @@
   "remove_node_type": "ReMVC",
   "time_slices_num": 48,
   "learning_rate": 0.001,
-  "mutual_neg_size": 5
+  "mutual_neg_size": 5,
+  "evaluate_tasks":["FI","MI","LPC"]
 }

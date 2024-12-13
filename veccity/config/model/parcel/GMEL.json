@@ -1,4 +1,5 @@
 {
     "output_dim": 128,
-    "representation_object": "region"
+    "representation_object": "region",
+    "evaluate_tasks":["FI","MI","LPC"]
 }

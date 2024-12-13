@@ -1,4 +1,3 @@
 {
-    "task_epoch":150,
-    "evaluate_tasks":["FI","MI","LPC"]
+    "task_epoch":150
 }

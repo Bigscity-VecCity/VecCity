@@ -24,8 +24,8 @@ class SpeedInferenceModel(AbstractModel):
         self.data_path = './raw_data/' + self.dataset + '/'
         data_cache_dir = os.path.join(cache_dir, self.dataset)
         self.min_freq=config.get('min_freq',1)
-        self.vocab_path = data_cache_dir+'/vocab_{}_True_{}.pkl'.format(self.dataset, self.min_freq)
-        self.vocab = WordVocab.load_vocab(self.vocab_path)
+        # self.vocab_path = data_cache_dir+'/vocab_{}_True_{}.pkl'.format(self.dataset, self.min_freq)
+        # self.vocab = WordVocab.load_vocab(self.vocab_path)
         self.choice=config.get('choice',0)
 
     def run(self, x, label):

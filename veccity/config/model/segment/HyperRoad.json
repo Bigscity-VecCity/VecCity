@@ -11,5 +11,7 @@
     "layer_num":4,
     "agg":"mean",
     "with_p":"True",
-    "weight_decay":1e-5
+    "weight_decay":1e-5,
+    "evaluate_tasks":["tte","tsi", "sts"],
+    "evaluate_models":["TravelTimeEstimationModel","SpeedInferenceModel","SimilaritySearchModel"]
 }

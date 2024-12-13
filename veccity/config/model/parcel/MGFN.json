@@ -2,5 +2,6 @@
   "output_dim": 128,
   "representation_object":"region",
   "learning_rate":0.0001,
-  "device": "cpu"
+  "device": "cpu",
+  "evaluate_tasks":["FI","MI","LPC"]
 }

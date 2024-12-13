@@ -405,8 +405,8 @@ class HHGCLEvaluator(AbstractEvaluator):
 
         # emb = np.load(embedding_path)  # (N, F)
         if self.representation_object == 'road':
-            evaluate_tasks = self.config.get("evaluate_tasks", ["tte"])#,"tsi", "sts"])
-            evaluate_models = self.config.get("evaluate_models", ["TravelTimeEstimationModel"])#,"SpeedInferenceModel"])#, "SimilaritySearchModel"])
+            evaluate_tasks = self.config.get("evaluate_tasks", ["tte","tsi", "sts"])
+            evaluate_models = self.config.get("evaluate_models", ["SpeedInferenceModel"])#,"SpeedInferenceModel"])#, "SimilaritySearchModel"])
                 
             for task, model_name in zip(evaluate_tasks, evaluate_models):
                 downstream_model = self.get_downstream_model(model_name)

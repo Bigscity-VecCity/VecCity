@@ -109,13 +109,13 @@ class STSModel(nn.Module):
         # similarity_matrix = F.cosine_similarity(out_view1.unsqueeze(1), out_view2.unsqueeze(0), dim=-1)
         similarity_matrix = torch.cdist(out_view1,out_view2)
         # 分类loss，轨迹模型精度下降
-        labels = torch.arange(similarity_matrix.shape[0]).long().to(self.device)
-        loss_res = self.criterion(similarity_matrix, labels)
+        # labels = torch.arange(similarity_matrix.shape[0]).long().to(self.device)
+        # loss_res = self.criterion(similarity_matrix, labels)
         # 二分类loss，只计算对角线的对错
-        # index=torch.eye(similarity_matrix.shape[0]).bool()
-        # preds=similarity_matrix[index]
-        # labels=torch.ones(similarity_matrix.shape[0]).to(self.device)
-        # loss_res=self.criterion(preds,labels)
+        index=torch.eye(similarity_matrix.shape[0]).bool()
+        preds=similarity_matrix[index]
+        labels=torch.ones(similarity_matrix.shape[0]).to(self.device)
+        loss_res=self.criterion(preds,labels)
         return loss_res
 
 class SimilaritySearchModel(AbstractModel):
@@ -133,9 +133,8 @@ class SimilaritySearchModel(AbstractModel):
     
     def run(self,model,**kwargs):
         self._logger.info("-------- STS START --------")
-        self.evaluation()
+        # self.evaluation()
         self.train(model,**kwargs)
-        
         return self.result
 
     def train(self,model,**kwargs):
@@ -151,6 +150,7 @@ class SimilaritySearchModel(AbstractModel):
         best_model=None
         best_epoch=0
         self.model.train()
+
         for epoch in range(self.epochs):
             total_loss = 0.0
             for step,(batch1,batch2) in enumerate(zip(self.train_ori_dataloader,self.train_qry_dataloader)):
