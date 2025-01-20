@@ -61,19 +61,6 @@ def evaluation_classify(X, y, kfold=5, num_classes=5, seed=42, output_dim=128,ch
         X_train, X_eval = X[train_idx], X[val_idx]
         y_train, y_eval = y[train_idx], y[val_idx]
 
-        if choice <100:
-            cur_lens=len(X_train)
-            k=int(cur_lens*choice/100)
-            index_range=list(range(cur_lens))
-            select_index=random.choices(index_range,k=k)
-            X_train=X_train[select_index]
-            y_train=y_train[select_index]
-            if fold_num==0:
-                print(f"do choice with {choice}%")
-                print(f"befor is {cur_lens}")
-                after=len(X_train)
-                print(f"after is {after}")
-
         X_train = torch.tensor(X_train).cuda()
         X_eval = torch.tensor(X_eval).cuda()
         y_train = torch.tensor(y_train).cuda()
@@ -131,18 +118,7 @@ def evaluation_bilinear_reg(embedding, flow, kfold=5, seed=42, output_dim=128,ch
     for fold_num, (train_idx, val_idx) in enumerate(kf.split(X, y)):
         X_train, X_eval = X[train_idx], X[val_idx]
         y_train, y_eval = y[train_idx], y[val_idx]
-        if choice <100:
-            cur_lens=len(X_train)
-            k=int(cur_lens*choice/100)
-            index_range=list(range(cur_lens))
-            select_index=random.choices(index_range,k=k)
-            X_train=X_train[select_index]
-            y_train=y_train[select_index]
-            if fold_num==0:
-                print(f"do choice with {choice}%")
-                print(f"befor is {cur_lens}")
-                after=len(X_train)
-                print(f"after is {after}")
+
         X_train = torch.tensor(X_train).cuda()
         X_eval = torch.tensor(X_eval).cuda()
         y_train = torch.tensor(y_train).cuda()
@@ -190,19 +166,6 @@ def evaluation_reg(origin_X, origin_y, kfold=5, seed=42, output_dim=128,choice=1
         X_train, X_test = X[train_idx], X[test_idx]
         y_train, y_test = y[train_idx], y[test_idx]
 
-        if choice <100:
-            cur_lens=len(X_train)
-            k=int(cur_lens*choice/100)
-            index_range=list(range(cur_lens))
-            select_index=random.choices(index_range,k=k)
-            X_train=X_train[select_index]
-            y_train=y_train[select_index]
-            if fold_num==0:
-                print(f"do choice with {choice}%")
-                print(f"befor is {cur_lens}")
-                after=len(X_train)
-                print(f"after is {after}")
-
         reg = linear_model.Ridge(alpha=1.0, random_state=seed)
         reg.fit(X_train, y_train)
         y_pred = reg.predict(X_test)
@@ -237,7 +200,7 @@ class HHGCLEvaluator(AbstractEvaluator):
             .format(self.exp_id, self.model_name, self.dataset, self.output_dim)
         self.road_embedding_path = './veccity/cache/{}/evaluate_cache/road_embedding_{}_{}_{}.npy'\
             .format(self.exp_id, self.model_name, self.dataset, self.embed_size)
-        geo_df = pd.read_csv(os.path.join('raw_data', self.dataset, self.dataset + '.geo'))
+        geo_df = pd.read_csv(os.path.join('raw_data', self.dataset, self.dataset + '.geo'), low_memory=False)
         self.num_nodes = geo_df[geo_df['traffic_type'] == self.representation_object].shape[0]
         self.num_regions = geo_df[geo_df['traffic_type'] == 'region'].shape[0]
         self.num_roads = geo_df[geo_df['traffic_type'] == 'road'].shape[0]
@@ -387,14 +350,13 @@ class HHGCLEvaluator(AbstractEvaluator):
             raise AttributeError('evaluate model is not found')
 
     def evaluate_embedding(self, model=None,**kwargs):
-        
         if self.representation_object == 'road':
             embedding_path = self.road_embedding_path
         else:
             embedding_path = self.region_embedding_path
-        emb = np.load(embedding_path)
-        # emb=model
-        self._logger.info(f'Load {self.representation_object} emb {embedding_path}, shape = {emb.shape}')
+        emb_vec = np.load(embedding_path)
+        emb=model
+        self._logger.info(f'Load {self.representation_object} emb {embedding_path}, shape = {emb.output_dim}')
         
         def add_prefix_to_keys(dictionary, prefix):
             new_dictionary = {}
@@ -405,14 +367,14 @@ class HHGCLEvaluator(AbstractEvaluator):
 
         # emb = np.load(embedding_path)  # (N, F)
         if self.representation_object == 'road':
-            evaluate_tasks = self.config.get("evaluate_tasks", ["tte","tsi", "sts"])
+            evaluate_tasks = self.config.get("evaluate_tasks", ["sts","tte","tsi"])
             evaluate_models = self.config.get("evaluate_models", ["SpeedInferenceModel"])#,"SpeedInferenceModel"])#, "SimilaritySearchModel"])
                 
             for task, model_name in zip(evaluate_tasks, evaluate_models):
                 downstream_model = self.get_downstream_model(model_name)
                 if task in ["tsi"]:
                     label = self.data_label[task]
-                    result = downstream_model.run(emb, label)
+                    result = downstream_model.run(emb_vec, label)
                 if task in ["tte"]:
                     label = self.data_label[task]
                     result = downstream_model.run(emb, label, model, **kwargs)
@@ -425,23 +387,23 @@ class HHGCLEvaluator(AbstractEvaluator):
         elif self.representation_object == 'region':
             evaluate_tasks = self.config.get("evaluate_tasks", ["eci"])
             evaluate_models = self.config.get("evaluate_models", ["RegressionModel"])
-            for task, model_name in zip(evaluate_tasks, evaluate_models):
-                if task not in self.data_label.keys():
-                    continue
-                downstream_model = self.get_downstream_model(model_name)
-                label = self.data_label[task]
-                result = downstream_model.run(emb, label)
-                self.result.update(add_prefix_to_keys(result, task + '_'))
+            # for task, model_name in zip(evaluate_tasks, evaluate_models):
+            #     if task not in self.data_label.keys():
+            #         continue
+            #     downstream_model = self.get_downstream_model(model_name)
+            #     label = self.data_label[task]
+            #     result = downstream_model.run(emb, label)
+            #     self.result.update(add_prefix_to_keys(result, task + '_'))
             
             if 'FI' in evaluate_tasks:
-                mae, rmse, r2, mape = self._valid_flow(emb)
+                mae, rmse, r2, mape = self._valid_flow(emb_vec)
                 self.result['mae'] = [mae]
                 self.result['rmse'] = [rmse]
                 self.result['mape'] = [mape]
                 self.result['r2'] = [r2]
 
             if 'MI' in evaluate_tasks:
-                bilinear_mae,bilinear_rmse,bilinear_r2,bilinear_mape = self._valid_flow_using_bilinear(emb)
+                bilinear_mae,bilinear_rmse,bilinear_r2,bilinear_mape = self._valid_flow_using_bilinear(emb_vec)
                 self.result['bilinear_mae'] = [bilinear_mae]
                 self.result['bilinear_rmse'] = [bilinear_rmse]
                 self.result['bilinear_mape'] = [bilinear_mape]
@@ -450,16 +412,9 @@ class HHGCLEvaluator(AbstractEvaluator):
             if 'LPC' in evaluate_tasks:
                 if self.config.get(f'{self.representation_object}_clf_label', None) is not None:
                     self._logger.warning(f'Evaluating {self.representation_object} Classification')
-                    y_truth,useful_index,micro_f1, macro_f1 = self._valid_clf(emb)
+                    y_truth,useful_index,micro_f1, macro_f1 = self._valid_clf(emb_vec)
                     self.result['clf_micro_f1'] = [micro_f1]
                     self.result['clf_macro_f1'] = [macro_f1]
-                    # self._logger.warning(f'Evaluating {self.representation_object} Emb by TSNE ans Kmeans')
-                    # sc, db, ch, nmi, ars = self.evaluation_cluster(y_truth,useful_index,emb, self.representation_object)
-                    # self.result['sc'] = [sc]
-                    # self.result['db'] = [db]
-                    # self.result['ch'] = [ch]
-                    # self.result['nmi'] = [nmi]
-                    # self.result['ars'] = [ars]
 
     def get_downstream_model(self, model):
         try:

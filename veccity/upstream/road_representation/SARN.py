@@ -211,7 +211,7 @@ class SARN(AbstractReprLearningModel):
         logging.info("enc_train_time:{} \n enc_train_gpu:{} \n enc_train_ram:{} \n".format(time.time()-training_starttime, training_gpu_usage, training_ram_usage))
 
 
-    def finetune_forward(self, sub_seg_idxs, is_training: bool):
+    def encode(self, sub_seg_idxs, is_training: bool):
         if is_training:
             self.feat_emb.train()
             self.model.train()

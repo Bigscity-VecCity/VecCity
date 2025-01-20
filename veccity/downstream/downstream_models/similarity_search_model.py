@@ -67,10 +67,11 @@ class TrajEncoder(nn.Module):
         # valid_len=batch['lengths']
         padding_masks=batch['padding_masks']
         
-        original_shape = path.shape  # [batch_size, traj_len]
-        full_embed = [torch.from_numpy(self.embedding[int(i)]).to(torch.float32) for i in path.reshape(-1)]
-        full_embed = torch.stack(full_embed)
-        full_embed = full_embed.view(*original_shape, self.input_dim).to(self.device)  # [batch_size, traj_len, embed_size]
+        # original_shape = path.shape  # [batch_size, traj_len]
+        # full_embed = [torch.from_numpy(self.embedding[int(i)]).to(torch.float32) for i in path.reshape(-1)]
+        # full_embed = torch.stack(full_embed)
+        # full_embed = full_embed.view(*original_shape, self.input_dim).to(self.device)  # [batch_size, traj_len, embed_size]
+        full_embed = self.embedding.encode(path)
         # pack_x = pack_padded_sequence(full_embed, lengths=valid_len, batch_first=True, enforce_sorted=False).to(self.device)
         h0 = torch.zeros(self.n_layers, full_embed.size(0), self.hidden_dim).to(self.device)
         c0 = torch.zeros(self.n_layers, full_embed.size(0), self.hidden_dim).to(self.device)

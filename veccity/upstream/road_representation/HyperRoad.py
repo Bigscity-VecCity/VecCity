@@ -29,7 +29,7 @@ class HyperRoad(AbstractReprLearningModel):
         self.with_p = config.get('with_p')
         self.one_hot_dim = data_feature.get('one_hot_dim')
         self.lane_cls_num = data_feature.get('lane_cls_num')
-        
+        self.output_dim = self.emb_size
         self.speed_cls_num = data_feature.get('speed_cls')
         self.oneway_cls_num = data_feature.get('oneway_cls')
         self.epoches = config.get('max_epoch')
@@ -50,6 +50,10 @@ class HyperRoad(AbstractReprLearningModel):
 
     def forward(self, batch):
         return self.model(batch)
+    
+    def encode(self,x):
+        road_emb, hyper_emb = self.model.update()
+        return road_emb[x]
     
     def run(self, data=None,test_data=None):
         if not self.config.get('train') and os.path.exists(self.road_embedding_path):

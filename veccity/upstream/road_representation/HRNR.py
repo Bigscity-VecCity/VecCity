@@ -39,7 +39,7 @@ class HRNR(AbstractReprLearningModel):
         hparams.lane_num=data_feature.get("lane_num")
         hparams.length_num=data_feature.get("length_num")
         hparams.type_num=data_feature.get("type_num")
-        hparams.node_num=data_feature.get("num_nodes")
+        hparams.node_num=data_feature.get("num_nodes")+1# 引入padding
 
         edge = self.adj.indices()
         edge_e = torch.ones(edge.shape[1], dtype=torch.float).to(self.device)
@@ -48,7 +48,7 @@ class HRNR(AbstractReprLearningModel):
 
         self.graph_enc = GraphEncoderTL(hparams, self.struct_assign, self.fnc_assign, struct_adj, self.device)
 
-        self.linear = torch.nn.Linear(self.hidden_dims * 2, self.label_num)
+        self.linear = torch.nn.Linear(self.hidden_dims * 2, self.output_dim).to(self.device)
 
         self.node_emb, self.init_emb = None, None
 
@@ -57,14 +57,19 @@ class HRNR(AbstractReprLearningModel):
         self.road_embedding_path = './veccity/cache/{}/evaluate_cache/road_embedding_{}_{}_{}.npy'. \
             format(self.exp_id, self.model, self.dataset, self.output_dim)
 
-    def forward(self, x):
+    def encode(self, x):
         self.node_emb = self.graph_enc(self.node_feature, self.type_feature, self.length_feature, self.lane_feature, self.adj)
         self.init_emb = self.graph_enc.init_feat
-        output_state = torch.cat((self.node_emb[x], self.init_emb[x]), 1)
-        pred_tra = self.linear(output_state)
-        return pred_tra
+        
+        output_state = torch.cat((self.node_emb[x], self.init_emb[x]), -1)
+        output_state = self.linear(output_state)
+
+        return output_state
         
     def run(self, train_dataloader, eval_dataloader):
+        if True:
+            return
+
         self._logger.info("Starting training...")
         hparams = dict_to_object(self.config.config)
         ce_criterion = torch.nn.CrossEntropyLoss()

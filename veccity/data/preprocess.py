@@ -79,7 +79,7 @@ class preprocess_traj(PreProcess):
             traj_id = []
             start_time = []
             lst_traj_id, lst_usr_id = None, None
-            geo_df = pd.read_csv(self.geo_file)
+            geo_df = pd.read_csv(self.geo_file, low_memory=False)
             num_regions = int(geo_df[geo_df['traffic_type'] == 'region'].shape[0])
             gen_region_traj = True
             for _, row in tqdm(dyna_df.iterrows(), total=dyna_df.shape[0]):
@@ -213,7 +213,7 @@ class preprocess_csv(PreProcess):
            not os.path.exists(os.path.join(self.data_dir, 'region.csv')) or\
            not os.path.exists(os.path.join(self.data_dir, 'road.csv')):
             self._logger.info('Start preprocess csv.')
-            geo_df = pd.read_csv(self.geo_file)
+            geo_df = pd.read_csv(self.geo_file, low_memory=False)
             df_dict = {
                 'poi': pd.DataFrame(),
                 'region': pd.DataFrame(),
@@ -318,7 +318,7 @@ class preprocess_od(PreProcess):
                 # traj_df = pd.read_csv(traj_road_path)
                 # num_days = traj_df['start_time'].map(str2date).drop_duplicates().shape[0]
                 num_days = 0
-                geo_df = pd.read_csv(self.geo_file)
+                geo_df = pd.read_csv(self.geo_file, low_memory=False)
                 num_regions = geo_df[geo_df['traffic_type'] == 'region'].shape[0]
                 num_roads = geo_df[geo_df['traffic_type'] == 'road'].shape[0]
                 save_traj_od_matrix(self.data_dir, 'traj_region'      , num_regions)
@@ -347,7 +347,7 @@ class preprocess_od(PreProcess):
         file_path_train = os.path.join(self.data_dir, 'od_region_train_od.npy')
         file_path_test = os.path.join(self.data_dir, 'od_region_test_od.npy')
         if not os.path.exists(file_path_train) or not os.path.exists(file_path_test):
-            geo_df = pd.read_csv(self.geo_file)
+            geo_df = pd.read_csv(self.geo_file, low_memory=False)
             num_regions = geo_df[geo_df['traffic_type'] == 'region'].shape[0]
             save_od_od_matrix(self.data_dir, 'od_region_train', num_regions)
             save_od_od_matrix(self.data_dir, 'od_region_test' , num_regions)
@@ -366,7 +366,7 @@ class preprocess_feature(PreProcess):
         if os.path.exists(os.path.join(self.data_dir, 'region_features.csv')) and \
             os.path.exists(os.path.join(self.data_dir, 'road_features.csv')):
             return
-        geo_df = pd.read_csv(self.geo_file)
+        geo_df = pd.read_csv(self.geo_file, low_memory=False)
         if not os.path.exists(os.path.join(self.data_dir, 'region_features.csv')):
             flag = True
             for key in ['region_FUNCTION', 'region_InCBD', 'region_FORM_TYPE']:
@@ -412,7 +412,7 @@ def k_shortest_paths_nx(G, source, target, k, weight='weight'):
 def build_graph(rel_file, geo_file):
 
     rel = pd.read_csv(rel_file)
-    geo = pd.read_csv(geo_file)
+    geo = pd.read_csv(geo_file, low_memory=False)
 
     node_size=geo[geo['traffic_type'] == 'road'].shape[0]
     offset=geo[geo['traffic_type'] == 'region'].shape[0]
@@ -459,7 +459,7 @@ def avg_speed(config):
     print(geo_file, rel_file, 'raw_data')
 
     rel = pd.read_csv(rel_file)
-    geo = pd.read_csv(geo_file)
+    geo = pd.read_csv(geo_file, low_memory=False)
     #调整成只有road的版本
     geo=geo[geo.traffic_type=='road']
     rel=rel[rel.rel_type=='road2road']
@@ -584,7 +584,7 @@ def preprocess_detour(config):
     graph,node_size = build_graph(rel_path, geo_path)
     def cal_time():
 
-        geo = pd.read_csv(geo_path)
+        geo = pd.read_csv(geo_path,low_memory=False)
         geo=geo[geo['traffic_type']=="road"]
         tall = pd.read_csv(cache_dir+'/{}/traj_road.csv'.format(dataset))
 
@@ -719,7 +719,7 @@ class preprocess_neighbor(PreProcess):
         if os.path.exists(file_path_road) and os.path.exists(file_path_region):
             return
         rel_df = pd.read_csv(self.rel_file)
-        geo_df = pd.read_csv(self.geo_file)
+        geo_df = pd.read_csv(self.geo_file, low_memory=False)
         num_regions = geo_df[geo_df['traffic_type'] == 'region'].shape[0]
         num_roads = geo_df[geo_df['traffic_type'] == 'road'].shape[0]
         save_neighbor('road', rel_df, num_regions, self.data_dir, num_roads)

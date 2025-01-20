@@ -19,6 +19,7 @@ from veccity.upstream.road_representation.HRNR import get_sparse_adj
 from veccity.utils import ensure_dir
 from logging import getLogger
 from veccity.data.preprocess import preprocess_all, cache_dir
+from tqdm import tqdm, trange
 
 
 class HRNRDataset(AbstractDataset):
@@ -41,6 +42,7 @@ class HRNRDataset(AbstractDataset):
         ensure_dir(self.cache_file_folder)
         self.geo_file = self.data_path + self.config.get("geo_file", self.dataset) + ".geo"
         self.rel_file = self.data_path + self.config.get("rel_file", self.dataset) + ".grel"
+        
 
         # HRNR data
         
@@ -49,7 +51,8 @@ class HRNRDataset(AbstractDataset):
         self.adj = os.path.join(self.cache_file_folder, f"cache_{self.dataset}_adj.pickle")
         self.tsr = os.path.join(self.cache_file_folder, f"cache_{self.dataset}_struct_assign.pickle")
         self.trz = os.path.join(self.cache_file_folder, f"cache_{self.dataset}_fnc_assign.pickle")
-
+        self.trans_matrix_file = os.path.join(self.cache_file_folder, f"cache_{self.dataset}_trans_matrix.pickle")
+        
         self.device = self.config.get('device', torch.device('cuda:1'))
 
         self.num_nodes = 0
@@ -58,6 +61,7 @@ class HRNRDataset(AbstractDataset):
 
         
         self._transfer_files()
+        self.trans_matrix = self.cal_trans_matrix()
         self._calc_transfer_matrix()
 
         self._logger.info("Dataset initialization Done.")
@@ -65,6 +69,33 @@ class HRNRDataset(AbstractDataset):
         self._logger.info("lane_num: " + str(self.lane_num))
         self._logger.info("type_num: " + str(self.type_num))
         self._logger.info("length_num: " + str(self.length_num))
+    
+    def cal_trans_matrix(self):
+        if os.path.exists(self.trans_matrix_file):
+            return pickle.load(open(self.trans_matrix_file, "rb"))
+        data_cache_dir = os.path.join(cache_dir, self.dataset)
+        trajs = os.path.join(data_cache_dir, 'traj_road_train.csv')
+        trajs = pd.read_csv(trajs).path.apply(eval).tolist()
+        # 计算trajs中的转移矩阵
+        trans_matrix = np.zeros((self.num_nodes, self.num_nodes))
+        L = 5
+        trg = trange(len(trajs))
+        for traj in trajs:
+            trg.set_description("processing traj")
+            last_L =[]
+            for i in range(1, len(traj)):
+                for j in range(len(last_L)):
+                    trans_matrix[last_L[j]][traj[i]] += 1
+                if len(last_L) < L:
+                    last_L.append(traj[i])
+                else:
+                    last_L.pop(0)
+                    last_L.append(traj[i])
+            
+            trg.update(1)
+        pickle.dump(trans_matrix, open(self.trans_matrix_file, "wb"))
+        return trans_matrix            
+                
 
 
     def _transfer_files(self):
@@ -93,8 +124,7 @@ class HRNRDataset(AbstractDataset):
             self.length_num = self.length_feature.max().item() + 10
             self.node_feature = torch.tensor(self.node_feature_list[:, 3], dtype=torch.long, device=self.device)
             return
-        # import pdb
-        # pdb.set_trace()
+        
         geo = pd.read_csv(self.geo_file)
         geo = geo[geo.type=="LineString"]
         rel = pd.read_csv(self.rel_file)
@@ -214,9 +244,9 @@ class HRNRDataset(AbstractDataset):
         self._logger.info("SR_GAT: " + str((self.k1, self.hidden_dims))
                           + " -> " + str((self.k1, self.k2)))
         loss1 = torch.nn.BCELoss()
-        optimizer1 = optim.Adam(SR_GAT.parameters(), lr=5e-2)  # TODO: lr
+        optimizer1 = optim.Adam(SR_GAT.parameters(), lr=1e-4)  # TODO: lr
         optimizer1.zero_grad()
-        for i in range(10):  # TODO: 迭代次数
+        for i in range(300):  # TODO: 迭代次数
             self._logger.info("epoch " + str(i))
             W1 = SR_GAT(NS, sparse_AS)
             TSR = W1 * M1
@@ -227,7 +257,7 @@ class HRNRDataset(AbstractDataset):
             _NS = TSR.mm(NR)
             _AS = torch.sigmoid(_NS.mm(_NS.t()))
             loss = loss1(_AS.reshape(self.k1 * self.k1), AS.reshape(self.k1 * self.k1))
-            self._logger.info(" loss: " + str(loss))
+            self._logger.info(" loss: " + str(loss.item()))
             loss.backward(retain_graph=True)
             optimizer1.step()
             optimizer1.zero_grad()
@@ -241,11 +271,14 @@ class HRNRDataset(AbstractDataset):
                           + " -> " + str((self.k2, self.k3)))
         self._logger.info("getting reachable matrix...")
         loss2 = torch.nn.MSELoss()
-        optimizer2 = optim.Adam(RZ_GCN.parameters(), lr=5e-2)  # TODO: lr
+        optimizer2 = optim.Adam(RZ_GCN.parameters(), lr=1e-3)  # TODO: lr
         optimizer2.zero_grad()
         C = torch.tensor(Utils(self.num_nodes, self.adj_matrix).get_reachable_matrix(), dtype=torch.float)
+        # 将频次转移矩阵转化为频率转移矩阵
+        trans_matrix = self.trans_matrix / (self.trans_matrix.sum(0) + 1e-10)
+        C = C + torch.tensor(trans_matrix, dtype = torch.float) # 引入轨迹转移矩阵
         self._logger.info("calculating TRZ...")
-        for i in range(10):  # TODO: 迭代次数
+        for i in range(300):  # TODO: 迭代次数
             self._logger.info("epoch " + str(i))
             TRZ = RZ_GCN(NR.unsqueeze(0), AR.unsqueeze(0)).squeeze()
             TRZ = torch.softmax(TRZ, dim=0)
@@ -254,7 +287,8 @@ class HRNRDataset(AbstractDataset):
             _NS = TSR.mm(TRZ).mm(NZ)
             _C = _NS.mm(_NS.t())
             loss = loss2(C.reshape(self.k1 * self.k1), _C.reshape(self.k1 * self.k1))
-            self._logger.info(" loss: " + str(loss))
+            self._logger.info(" loss: " + str(loss.item()))
+
             loss.backward(retain_graph=True)
             optimizer2.step()
             optimizer2.zero_grad()
