@@ -103,19 +103,19 @@ class LINEDataset(AbstractDataset):
 
     def _load_geo(self):
         """
-        加载.geo文件，格式[geo_id, type, coordinates, properties(若干列)]
+        加载.geo文件，格式[geo_uid, type, coordinates, properties(若干列)]
         """
         geofile = pd.read_csv(self.data_path + self.geo_file + '.geo')
-        self.geo_ids = list(geofile['geo_id'])
-        self.num_nodes = len(self.geo_ids)
+        self.geo_uids = list(geofile['geo_uid'])
+        self.num_nodes = len(self.geo_uids)
         self._geo_to_ind = {}
-        for index, idx in enumerate(self.geo_ids):
+        for index, idx in enumerate(self.geo_uids):
             self._geo_to_ind[idx] = index
         self._logger.info("Loaded file " + self.geo_file + '.geo' + ', num_nodes=' + str(self.num_nodes))
 
     def _load_rel(self):
         """
-        加载.rel文件，格式[rel_id, type, origin_id, destination_id, properties(若干列)],
+        加载.rel文件，格式[rel_uid, type, orig_geo_id, destination_id, properties(若干列)],
         生成N*N的矩阵，默认.rel存在的边表示为1，不存在的边表示为0
 
         Returns:
@@ -132,10 +132,10 @@ class LINEDataset(AbstractDataset):
         map_info = pd.read_csv(self.data_path + self.rel_file + '.grel')
         if 'weight' in map_info.columns:
             self.edges = [(self._geo_to_ind[e[0]], self._geo_to_ind[e[1]], e[2]) for e in
-                          map_info[['origin_id', 'destination_id', 'weight']].values]
+                          map_info[['orig_geo_id', 'destination_id', 'weight']].values]
         else:
             self.edges = [(self._geo_to_ind[e[0]], self._geo_to_ind[e[1]], 1) for e in
-                          map_info[['origin_id', 'destination_id']].values]
+                          map_info[['orig_geo_id', 'destination_id']].values]
         self.num_edges = len(self.edges)
         self._logger.info("Loaded file " + self.rel_file + '.grel' + ', num_edges=' + str(self.num_edges))
 

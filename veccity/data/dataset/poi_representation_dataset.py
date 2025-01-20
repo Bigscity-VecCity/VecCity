@@ -311,9 +311,9 @@ class POIRepresentationDataset(AbstractDataset):
                 self.max_seq_len=pickle.load(f)
                 self.df = self.df[self.df['user_index'].isin(self.user_index_map)]
                 self.df = self.df[self.df['loc_index'].isin(self.loc_index_map)]
-                self.coor_df = self.coor_df[self.coor_df['geo_id'].isin(loc_index_map)]
+                self.coor_df = self.coor_df[self.coor_df['geo_uid'].isin(loc_index_map)]
                 self.df['user_index'] = self.df['user_index'].map(user_index_map)
-                self.coor_df['geo_id'] = self.coor_df['geo_id'].map(loc_index_map)
+                self.coor_df['geo_uid'] = self.coor_df['geo_uid'].map(loc_index_map)
                 self.df['loc_index'] = self.df['loc_index'].map(loc_index_map)
                 self.num_user = len(user_index_map)
                 self.num_loc = self.coor_df.shape[0]
@@ -336,8 +336,8 @@ class POIRepresentationDataset(AbstractDataset):
     def _load_geo(self):
         geo_df = pd.read_csv(os.path.join(self.data_path, self.geo_file + '.geo'),low_memory=False)
         geo_df = geo_df[geo_df['type'] == 'Point']
-        self.offset = geo_df['geo_id'].min()
-        poi_list = geo_df['coordinates'].tolist()
+        self.offset = geo_df['geo_uid'].min()
+        poi_list = geo_df['geo_location'].tolist()
         lng_list = []
         lat_list = []
         for s in poi_list:
@@ -346,7 +346,7 @@ class POIRepresentationDataset(AbstractDataset):
             lat_list.append(lat)
         lng_col = pd.Series(lng_list, name='lng')
         lat_col = pd.Series(lat_list, name='lat')
-        idx_col = pd.Series(list(range(len(geo_df))), name='geo_id')
+        idx_col = pd.Series(list(range(len(geo_df))), name='geo_uid')
         type_name = self.config.get('poi_type_name', None)
         if type_name is not None:
             category_list=list(geo_df[type_name].drop_duplicates())
@@ -363,20 +363,20 @@ class POIRepresentationDataset(AbstractDataset):
         dyna_df = pd.read_csv(os.path.join(self.data_path, self.dyna_file + '.citraj'))
         # TODO 区分 trajectory 和 check-in
         dyna_df = dyna_df[dyna_df['type'] == 'trajectory']
-        # dyna_df['location'] = dyna_df['geo_id'] - self.offset
-        dyna_df = dyna_df.merge(self.coor_df, left_on='location', right_on='geo_id', how='left')
+        # dyna_df['location'] = dyna_df['geo_uid'] - self.offset
+        dyna_df = dyna_df.merge(self.coor_df, left_on='geo_id', right_on='geo_uid', how='left')
         dyna_df.rename(columns={'time': 'datetime'}, inplace=True)
-        dyna_df.rename(columns={'location': 'loc_index'}, inplace=True)
-        dyna_df.rename(columns={'entity_id': 'user_index'}, inplace=True)
+        dyna_df.rename(columns={'geo_id': 'loc_index'}, inplace=True)
+        dyna_df.rename(columns={'user_id': 'user_index'}, inplace=True)
         self.df = dyna_df[['user_index', 'loc_index', 'datetime', 'lat', 'lng']]
         user_counts = self.df['user_index'].value_counts()
         self.df = self.df[self.df['user_index'].isin(user_counts.index[user_counts >= self.min_poi_cnt])]
         loc_counts = self.df['loc_index'].value_counts()
-        self.coor_df = self.coor_df[self.coor_df['geo_id'].isin(loc_counts.index[loc_counts >= self.min_frequency])]
+        self.coor_df = self.coor_df[self.coor_df['geo_uid'].isin(loc_counts.index[loc_counts >= self.min_frequency])]
         self.df = self.df[self.df['loc_index'].isin(loc_counts.index[loc_counts >= self.min_frequency])]
         # 等到最后处理完再进行映射
-        # loc_index_map = self.gen_index_map(self.coor_df, 'geo_id')
-        # self.coor_df['geo_id'] = self.coor_df['geo_id'].map(loc_index_map)
+        # loc_index_map = self.gen_index_map(self.coor_df, 'geo_uid')
+        # self.coor_df['geo_uid'] = self.coor_df['geo_uid'].map(loc_index_map)
         # self.df['loc_index'] = self.df['loc_index'].map(loc_index_map)
         # user_index_map = self.gen_index_map(self.df, 'user_index')
         # self.df['user_index'] = self.df['user_index'].map(user_index_map)
@@ -421,9 +421,9 @@ class POIRepresentationDataset(AbstractDataset):
         u_list=self.res.keys()
         self.df=self.df[self.df['user_index'].isin(u_list)]
         loc_keys = self.df['loc_index'].value_counts().keys()
-        self.coor_df=self.coor_df[self.coor_df['geo_id'].isin(loc_keys)]
-        loc_index_map = self.gen_index_map(self.coor_df, 'geo_id')
-        self.coor_df['geo_id'] = self.coor_df['geo_id'].map(loc_index_map)
+        self.coor_df=self.coor_df[self.coor_df['geo_uid'].isin(loc_keys)]
+        loc_index_map = self.gen_index_map(self.coor_df, 'geo_uid')
+        self.coor_df['geo_uid'] = self.coor_df['geo_uid'].map(loc_index_map)
         self.df['loc_index'] = self.df['loc_index'].map(loc_index_map)
         user_index_map = self.gen_index_map(self.df, 'user_index')
         self.df['user_index']=self.df['user_index'].map(user_index_map)
@@ -583,7 +583,7 @@ class POIRepresentationDataset(AbstractDataset):
         traj = pd.DataFrame(self.df, copy=True)
         traj['datetime'] = pd.to_datetime(traj["datetime"]) # take long time, can we just store the right format?
         traj['timestamp'] = traj['datetime'].apply(lambda x: x.timestamp())
-        # user_set = pd.unique(traj['entity_id'])
+        # user_set = pd.unique(traj['user_id'])
         res = {}
         min_session_len = self.min_len # 每个session中至少有3个轨迹
         min_sessions = self.min_sessions # 最少的session数
@@ -621,7 +621,7 @@ class POIRepresentationDataset(AbstractDataset):
         # elif cut_method == 'same_date':
         #     # 将同一天的 check-in 划为一条轨迹
         #     for uid in tqdm(user_set, desc="cut and filter trajectory"):
-        #         usr_traj = traj[traj['entity_id'] == uid].to_numpy()
+        #         usr_traj = traj[traj['user_id'] == uid].to_numpy()
         #         sessions = []  # 存放该用户所有的 session
         #         session = []  # 单条轨迹
         #         prev_date = None
@@ -651,7 +651,7 @@ class POIRepresentationDataset(AbstractDataset):
         #     if max_session_len != window_size:
         #         raise ValueError('the fixed length window is not equal to max_session_len')
         #     for uid in tqdm(user_set, desc="cut and filter trajectory"):
-        #         usr_traj = traj[traj['entity_id'] == uid].to_numpy()
+        #         usr_traj = traj[traj['user_id'] == uid].to_numpy()
         #         sessions = []  # 存放该用户所有的 session
         #         session = []  # 单条轨迹
         #         for index, row in enumerate(usr_traj):

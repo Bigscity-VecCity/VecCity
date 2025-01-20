@@ -39,7 +39,7 @@ class HRNR(AbstractReprLearningModel):
         hparams.lane_num=data_feature.get("lane_num")
         hparams.length_num=data_feature.get("length_num")
         hparams.type_num=data_feature.get("type_num")
-        hparams.node_num=data_feature.get("num_nodes")+1# 引入padding
+        hparams.node_num=data_feature.get("num_nodes")# 引入padding
 
         edge = self.adj.indices()
         edge_e = torch.ones(edge.shape[1], dtype=torch.float).to(self.device)

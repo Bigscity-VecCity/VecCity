@@ -134,9 +134,9 @@ class STARTDataset(LineSeqDataset):
         self._logger.info('node_features: ' + str(node_features.shape))  # (N, fea_dim)
         node_fea_vec = np.zeros((self.vocab.vocab_size, node_features.shape[1]))
         for ind in range(len(node_features)):
-            geo_id = self.ind_to_geo[ind]
-            encoded_geo_id = self.vocab.loc2index[geo_id]
-            node_fea_vec[encoded_geo_id] = node_features[ind]
+            geo_uid = self.ind_to_geo[ind]
+            encoded_geo_uid = self.vocab.loc2index[geo_uid]
+            node_fea_vec[encoded_geo_uid] = node_features[ind]
         if self.normal_feature:
             self._logger.info('node_features by a/row_sum(a)')  # (vocab_size, fea_dim)
             row_sum = np.clip(node_fea_vec.sum(1), a_min=1, a_max=None)
@@ -184,7 +184,7 @@ class STARTDataset(LineSeqDataset):
 def trans_probs(road_df,geo_to_ind, ind_to_geo,adj_mx,base_path,road_name,K,max_length,traj_train):
 
     
-    geo_ids = list(road_df['id'])
+    geo_uids = list(road_df['id'])
     num_nodes = len(ind_to_geo)
 
     path = os.path.join(base_path, '{0}_neighbors_{1}.json'.format(road_name, K))
@@ -202,13 +202,13 @@ def trans_probs(road_df,geo_to_ind, ind_to_geo,adj_mx,base_path,road_name,K,max_
         print('Finish sum of K order adj_mx')
         geoid2neighbors = {}
         for i in tqdm(range(len(adj_mx_bool)), desc='count neighbors'):
-            geo_id = int(ind_to_geo[i])
-            geoid2neighbors[geo_id] = []
+            geo_uid = int(ind_to_geo[i])
+            geoid2neighbors[geo_uid] = []
             for j in range(adj_mx_bool.shape[1]):
                 if adj_mx_bool[i][j] == 0:
                     continue
                 ner_id = int(ind_to_geo[j])
-                geoid2neighbors[geo_id].append(ner_id)
+                geoid2neighbors[geo_uid].append(ner_id)
         json.dump(geoid2neighbors, open(path, 'w'))
         print('Total edge@{} = {}'.format(1, adj_mx.sum()))
         print('Total edge@{} = {}'.format(K, adj_mx_bool.sum()))
@@ -224,7 +224,7 @@ def trans_probs(road_df,geo_to_ind, ind_to_geo,adj_mx,base_path,road_name,K,max_
         count_array_col = np.zeros([num_nodes], dtype=int)
 
         train_file = traj_train
-        train = pd.read_csv(train_file, dtype={'id': int, 'hop': int, 'traj_id': int})
+        train = pd.read_csv(train_file, dtype={'id': int, 'hop': int, 'traj_uid': int})
 
         for _, row in tqdm(train.iterrows(), total=train.shape[0], desc='count traj prob'):
             plist = eval(row.path)[:max_length]

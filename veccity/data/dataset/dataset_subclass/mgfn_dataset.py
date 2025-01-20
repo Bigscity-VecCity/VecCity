@@ -54,7 +54,7 @@ class MGFNDataset(AbstractDataset):
         od_file = pd.read_csv(os.path.join(cache_dir, self.dataset, 'od_region_train.csv'))
         flow_graph = np.zeros([self.time_slice, self.num_nodes, self.num_nodes])
         for _, row in od_file.iterrows():
-            origin_region = int(row['origin_id'])
+            origin_region = int(row['orig_geo_id'])
             destination_region = int(row['destination_id'])
             time = datetime.fromtimestamp(int(row['end_time']))
             flow_graph[time.hour // time_each_slice][origin_region][destination_region] += 1

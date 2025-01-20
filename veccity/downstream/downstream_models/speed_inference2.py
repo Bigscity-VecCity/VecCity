@@ -38,10 +38,10 @@ class SpeedInferenceModel(AbstractModel):
         index_x=[]
         index_y=[]
         for i in range(index.shape[0]):
-            geo_id=index[i]
-            if geo_id in self.vocab.loc2index:
+            geo_uid=index[i]
+            if geo_uid in self.vocab.loc2index:
                 index_y.append(i)
-                index_x.append(self.vocab.loc2index[geo_id])
+                index_x.append(self.vocab.loc2index[geo_uid])
         
                 
         x=x[index_x]

@@ -38,17 +38,17 @@ class RoadRepresentationEvaluator(AbstractEvaluator):
 
     def _load_geo(self):
         """
-        加载.geo文件，格式[geo_id, type, coordinates, properties(若干列)]
+        加载.geo文件，格式[geo_uid, type, coordinates, properties(若干列)]
         """
         geofile = pd.read_csv(self.data_path + self.geo_file + '.geo')
-        self.geo_ids = list(geofile['geo_id'])
-        self.num_nodes = len(self.geo_ids)
+        self.geo_uids = list(geofile['geo_uid'])
+        self.num_nodes = len(self.geo_uids)
         self.geo_to_ind = {}
         self.ind_to_geo = {}
-        for index, idx in enumerate(self.geo_ids):
+        for index, idx in enumerate(self.geo_uids):
             self.geo_to_ind[idx] = index
             self.ind_to_geo[index] = idx
-        self._logger.info("Loaded file " + self.geo_file + '.geo' + ', num_nodes=' + str(len(self.geo_ids)))
+        self._logger.info("Loaded file " + self.geo_file + '.geo' + ', num_nodes=' + str(len(self.geo_uids)))
         return geofile
 
     def evaluate(self):
@@ -83,7 +83,7 @@ class RoadRepresentationEvaluator(AbstractEvaluator):
         self._logger.info('Evaluate result is saved at {}'.format(result_path))
         return
 
-        # !这个load_geo必须跟dataset部分相同，也就是得到同样的geo_id和index的映射，否则就会乱码
+        # !这个load_geo必须跟dataset部分相同，也就是得到同样的geo_uid和index的映射，否则就会乱码
         # TODO: 把dataset部分得到的geo_to_ind和ind_to_geo传过来
         rid_file = self._load_geo()
         # 记录每个类别都有哪些geo实体
@@ -100,7 +100,7 @@ class RoadRepresentationEvaluator(AbstractEvaluator):
 
         # QGIS可视化
         rid_type = rid_file['type'][0]
-        rid_pos = rid_file['coordinates']
+        rid_pos = rid_file['geo_location']
         rid2wkt = dict()
         if rid_type == 'LineString':
             for i in range(rid_pos.shape[0]):

@@ -90,7 +90,7 @@ class POIRepresentationEvaluator(AbstractEvaluator):
         downstream_batch_size = self.data_feature.get('downstream_batch_size', 32)
         # 随机划分数据集
         assert num_loc == len(category)
-        inputs=category.geo_id.to_numpy()
+        inputs=category.geo_uid.to_numpy()
         labels=category.category.to_numpy()
         
         num_class = labels.max()+1
@@ -165,7 +165,7 @@ class POIRepresentationEvaluator(AbstractEvaluator):
         
         category = self.data_feature.get('coor_df')
 
-        inputs=category.geo_id.to_numpy()
+        inputs=category.geo_uid.to_numpy()
         labels=category.category.to_numpy()
         num_class = labels.max()+1
 

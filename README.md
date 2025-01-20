@@ -50,7 +50,7 @@ You can also follow the instructions to [download processed city data](https://b
 ### Step 4: Run a training pipeline for MapRL models:
 
 ```
-python run_model.py --task poi --dataset nyc --model CTLE --exp_uid CTLE 
+python run_model.py --task poi --dataset nyc --model CTLE --exp_id CTLE 
 ```
 
 ## 3. Dataset Illustration
@@ -86,47 +86,49 @@ The following types of atomic files are defined:
 
 | filename    | content                                  | example                                  |
 | ----------- | ---------------------------------------- | ---------------------------------------- |
-| xxx.geo     | Each line in the file represents a map entity | geo_uid, geo_type, geo_location, geo_features|
-| xxx.grel     | Each line of the file records a non-zero geographic relation between two map entities. | rel_uid, ori_geo_uid, des_geo_uid, weight, feature, timestamp|
-| xxx.srel     | Store the relationship information between entities, such as areas. | rel_uid, type, origin_uid, destination_uid  |
-| xxx.citraj    |  Each line of the file corresponds to a sample of a check-in trajectory. | traj_uid, sample_uid, entity_uid, timestamp |
-| xxx.cdtraj    | Each line of the file corresponds to a sample of a coordinate trajectory. | traj_uid, sample_uid, entity_uid, timestamp |
+| xxx.geo     | Each line in the file represents a map entity | geo_uid, type, geo_location, geo_features|
+| xxx.grel     | Each line of the file records a non-zero geographic relation between two map entities. | rel_uid, ori_geo_id, des_geo_id, weight, feature, timestamp|
+| xxx.srel     | Store the relationship information between entities, such as areas. | rel_uid, type, orig_geo_id, dest_geo_id,weight  |
+| xxx.citraj    |  Each line of the file corresponds to a sample of a check-in trajectory. | traj_uid, sample_order, user_id, geo_id, time |
+| xxx.cdtraj    | Each line of the file corresponds to a sample of a coordinate trajectory. | traj_uid, sample_order, user_id, geo_id, time |
 | config.json | Used to store the config settings for data processing. |                                          |
 
 we explain the above four atomic files as follows:
 
 **xxx.geo**: An element in the entity table consists of the following four parts:
 
-**geo_uid, geo_type, geo_location, geo_features(multiple columns).**
+**geo_uid, geo_type, 'geo_location', geo_features(multiple columns).**
 
 ```
 geo_uid: This field records the unique ID for map entities.
-geo_type: This field recodes the entity's type, of which the value can be ``point'', ``polyline'' or ``polygon'', corresponding to POIs, road segments, and land parcels.
+type: This field recodes the entity's type, of which the value can be ``point'', ``polyline'' or ``polygon'', corresponding to POIs, road segments, and land parcels.
 geo_location: This field stores the geographical coordinates of a map entity: a single longitude and latitude for point entities, a sequence of coordinates for polylines, and a closed sequence of coordinates for polygons.
 geo_features (optional): This field stores the features of a map entity, with the format and length of this field varying based on the data type and number of features.
 ```
 
 **xxx.grel or xxx.srel**: An element in the relationship table consists of the following six parts:
 
-**rel_uid, ori_geo_uid, des_geo_uid, wight, feature(multiple columns), timestamp.**
+**rel_uid, orig_geo_id, dest_geo_id, wight, feature(multiple columns), time.**
 
 ```
 rel_uid: This field records the unique ID for a relationship between two map entities.
 ori_geo_uid & des_geo_uid: These two fields indicate the uIDs of the origin and destination map entities of a relation, with values matching the geo_uid listed in the *.geo* file.
-wight: This field recodes the weight of the edge corresponding to a map entity relation.
+wight (optional): This field recodes the weight of the edge corresponding to a map entity relation.
 feature (optional): This field stores additional features for a relation network edge. In some MapRL models, relation networks are modeled as heterogeneous graphs. This field can be used to store the type of heterogeneous edges. 
-timestamp (optional): This field stores timestamps for a relation and is essential for dynamic graphs, where edge weights and features correspond to the edge state during a specific time period.
+time (optional): This field stores timestamps for a relation and is essential for dynamic graphs, where edge weights and features correspond to the edge state during a specific time period.
 ```
 
 **xxx.citraj or xxx.cdtraj**: An element in the trajectory table consists of the following four parts:
 
-**traj_uid, sample_uid, entity_uid, timestamp**.
+**traj_uid, sample_order, user_id, geo_id, time, vflag**.
 
 ```
 traj_uid: The field specifies the unique ID of a trajectory that samples belong to.
-sample_uid: The field records the order index of a sample within a trajectory.
-entity_id: The field indicates the map entity to which a sample corresponds, with its value matching the *geo_uid* of the map entity listed in the *.geo* file.
+sample_order: The field records the order index of a sample within a trajectory.
+user_id: The field indicates the user who generates this record.
+geo_id: The field indicates the map entity to which a sample corresponds, with its value matching the *geo_uid* of the map entity listed in the *.geo* file.
 timestamp: The field stores a trajectory sample's timestamp, which is in the format of Unix timestamps.
+vflag (optional): whether the taxi has passengers.
 ```
 
 **config.json**: The config file is used to supplement the settings for data preprocessing.

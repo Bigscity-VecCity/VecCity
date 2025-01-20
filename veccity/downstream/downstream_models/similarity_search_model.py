@@ -28,15 +28,15 @@ def build_graph(rel_file, geo_file):
     edge2len = {}
     geoid2coord = {}
     for i, row in tqdm(geo.iterrows(), total=geo.shape[0]):
-        geo_id = row.geo_id
+        geo_uid = row.geo_uid
         length = float(row.length)
-        edge2len[geo_id] = length
-        # geoid2coord[geo_id] = row.coordinates
+        edge2len[geo_uid] = length
+        # geoid2coord[geo_uid] = row.coordinates
 
     graph = nx.DiGraph()
 
     for i, row in tqdm(rel.iterrows(), total=rel.shape[0]):
-        prev_id = row.origin_id
+        prev_id = row.orig_geo_id
         curr_id = row.destination_id
 
         # Use length as weight

@@ -49,7 +49,7 @@ class KmeansModel(AbstractModel):
 
     def _load_geo(self):
         """
-                加载.geo文件，格式[geo_id, type, coordinates, function,traffic_type]
+                加载.geo文件，格式[geo_uid, type, coordinates, function,traffic_type]
         """
         geofile = pd.read_csv(self.data_path + self.geo_file + '.geo')
         geofile_region = geofile[geofile['traffic_type'] == 'region']
@@ -59,7 +59,7 @@ class KmeansModel(AbstractModel):
         #QGIS可视化
         geofile = self._load_geo()
         df = []
-        region_geometry = [geojson2geometry(coordinate) for coordinate in geofile['coordinates']]
+        region_geometry = [geojson2geometry(coordinate) for coordinate in geofile['geo_location']]
         for i in range(len(y_pred)):
             df.append([i,y_pred[i],region_geometry[i]])
         df = pd.DataFrame(df)

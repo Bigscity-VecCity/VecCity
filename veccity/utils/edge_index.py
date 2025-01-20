@@ -64,5 +64,5 @@ class EdgeIndex:
         sub_edge_index = [(idx1_to_newidx[i], idx1_to_newidx[j]) for (i,j) in sub_edge_index]
         sub_edge_index = np.array(sub_edge_index, np.int64).T
         new_x_idx = idx1
-        mapping_to_origin_idx = [idx1_to_newidx[_i] for _i in sub_idx]
-        return sub_edge_index, new_x_idx, mapping_to_origin_idx
+        mapping_to_orig_geo_idx = [idx1_to_newidx[_i] for _i in sub_idx]
+        return sub_edge_index, new_x_idx, mapping_to_orig_geo_idx

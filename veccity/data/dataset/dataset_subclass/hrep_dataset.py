@@ -18,14 +18,12 @@ class HREPDataset(MVUREDataset):
 
     def __init__(self, config):
         super().__init__(config)
-        if not need_train(config):
-            return
         rel_df = pd.read_csv(os.path.join('./raw_data', self.dataset, self.dataset + '.grel'))
         region2region = rel_df[rel_df['rel_type'] == 'region2region']
         self.neighbor = [[] for _ in range(self.num_regions)]
         for i, row in region2region.iterrows():
-            r1 = int(row['origin_id'])
-            r2 = int(row['destination_id'])
+            r1 = int(row['orig_geo_id'])
+            r2 = int(row['dest_geo_id'])
             self.neighbor[r1].append(r2)
         for i in range(self.num_regions):
             if len(self.neighbor[i]) == 0:
