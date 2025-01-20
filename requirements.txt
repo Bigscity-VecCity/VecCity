@@ -6,12 +6,12 @@ tqdm
 networkx
 geopandas
 faiss-cpu
-scikit-learn=1.0.2
+scikit-learn==1.0.2
 seaborn
-geatpy=2.7.0
-numpy=1.23.4
+geatpy==2.7.0
+numpy==1.23.4
 geopy
-dgl-cu111=0.6.1
+dgl-cu111==0.6.1
 gensim
 pynvml
 psutil
