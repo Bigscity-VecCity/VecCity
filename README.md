@@ -45,7 +45,7 @@ pip install -r ./requirements.txt
 
 ### Step 3: Download processed data:
 
-You can also follow the instructions to [download processed city data](https://bhpan.buaa.edu.cn/link/AA904DB8317D61423995CA009146E0AF33) or process your own dataset.
+You can also follow the instructions to download processed city data from [bhpan](https://bhpan.buaa.edu.cn/link/AA904DB8317D61423995CA009146E0AF33), [Google Drive](https://drive.google.com/file/d/1JqnGsprG2zpJ4tisf0o3liOLy3GR7t0i/view?usp=drive_link) or process your own dataset.
 
 ### Step 4: Run a training pipeline for MapRL models:
 
@@ -56,7 +56,7 @@ python run_model.py --task poi --dataset nyc --model CTLE --exp_id CTLE
 ## 3. Dataset Illustration
 We open-source nine city datasets in New York, Chicago, Tokyo, San Francisco, Porto, Beijing, Chengdu, and Xi'an compatible with atomic files. 
 As the original dataset is quite large, we have included example data, data processing code, and model code to assist researchers in understanding our work. 
-The complete data sources can be found on [Beihang Pan](https://bhpan.buaa.edu.cn/link/AA904DB8317D61423995CA009146E0AF33).
+The complete data sources can be found on [Beihang Pan](https://bhpan.buaa.edu.cn/link/AA904DB8317D61423995CA009146E0AF33) or [Google Drive](https://drive.google.com/file/d/1JqnGsprG2zpJ4tisf0o3liOLy3GR7t0i/view?usp=drive_link).
 
 The above dataset construction scheme is highly reusable, one can prepare their own city data and use our code to build their personalized MapRL dataset easily. 
 We will provide a detailed explanation of our data and pre-processing module in the following. 
@@ -76,7 +76,7 @@ We will provide a detailed explanation of our data and pre-processing module in 
 | XA  | 19,108 | 5,269   | 1,056  | -        | 384,618   | 54,365 |
 
 
-We store the original unprocessed files in the [Beihang Pan](https://bhpan.buaa.edu.cn/link/AA904DB8317D61423995CA009146E0AF33) (You can find the detail of preprocess in README file which is placed in the city dataset dir).  After proprocessing, the original dataset will be storaged in atomic files.
+We store the original unprocessed files in the [Beihang Pan](https://bhpan.buaa.edu.cn/link/AA904DB8317D61423995CA009146E0AF33) or [Google Drive](https://drive.google.com/file/d/1JqnGsprG2zpJ4tisf0o3liOLy3GR7t0i/view?usp=drive_link) (You can find the detail of preprocess in README file which is placed in the city dataset dir).  After proprocessing, the original dataset will be storaged in atomic files.
 Our city dataset construction scheme is highly reusable. You can prepare your own data following either the file format in *atomic files*. This flexibility allows you to adapt the construction process to various cities and datasets easily.
 
 
