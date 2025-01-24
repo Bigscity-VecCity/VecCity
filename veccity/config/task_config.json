@@ -74,7 +74,7 @@
     },
     "parcel": {
         "allowed_model": [
-            "Node2Vec","HDGE","MGFN","LINE","ZEMob","MVURE","GMEL","ReMVC","HREP"
+            "Node2Vec","HDGE","MGFN","LINE","ZEMob","MVURE","GMEL","ReMVC","HREP","HAFusion","HGI","ReDCL"
         ],
         "allowed_dataset": [
             "xa","cd","bj"
@@ -121,6 +121,21 @@
         },
         "HREP": {
             "dataset_class": "HREPDataset",
+            "executor": "TwoStepExecutor",
+            "evaluator": "HHGCLEvaluator"
+        },
+        "HAFusion": {
+            "dataset_class": "HAFusionDataset",
+            "executor": "TwoStepExecutor",
+            "evaluator": "HHGCLEvaluator"
+        },
+        "HGI": {
+            "dataset_class": "HGIDataset",
+            "executor": "TwoStepExecutor",
+            "evaluator": "HHGCLEvaluator"
+        },
+        "ReDCL": {
+            "dataset_class": "ReDCLDataset",
             "executor": "TwoStepExecutor",
             "evaluator": "HHGCLEvaluator"
         }

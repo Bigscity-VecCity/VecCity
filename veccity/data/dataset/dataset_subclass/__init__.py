@@ -17,6 +17,9 @@ from veccity.data.dataset.dataset_subclass.hrnr_dataset import HRNRDataset
 from veccity.data.dataset.dataset_subclass.start_dataset import STARTDataset
 from veccity.data.dataset.dataset_subclass.eta_dataset import ETADataset
 from veccity.data.dataset.dataset_subclass.gmel_dataset import GMELDataset
+from veccity.data.dataset.dataset_subclass.hafusion_dataset import HAFusionDataset
+from veccity.data.dataset.dataset_subclass.hgi_dataset import HGIDataset
+from veccity.data.dataset.dataset_subclass.redcl_dataset import ReDCLDataset
 
 __all__ = [
     'CONVGCNDataset',
@@ -40,5 +43,8 @@ __all__ = [
     "STARTDataset",
     "ETADataset",
     "GMELDataset",
-    "JCLRNTABLDataset"
+    "JCLRNTABLDataset",
+    "HAFusionDataset",
+    "HGIDataset",
+    "ReDCLDataset"
 ]
