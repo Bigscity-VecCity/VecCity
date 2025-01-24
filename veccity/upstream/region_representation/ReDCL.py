@@ -532,7 +532,7 @@ class PatternTrainer(object):
     def train_pattern_contrastive(self, epochs, save_name):
         dataset = UnsupervisedPatternDataset(self.city_data)
         exp_id = self.config.get('exp_id')
-        save_path = f'VecCity/veccity/cache/{exp_id}/evaluate_cache'
+        save_path = f'veccity/cache/{exp_id}/evaluate_cache'
         if not os.path.exists(save_path):
             os.makedirs(save_path)
         train_loader = torch.utils.data.DataLoader(dataset, batch_size=64, shuffle=True,
