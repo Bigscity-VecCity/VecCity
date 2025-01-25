@@ -11,6 +11,8 @@ from veccity.upstream.road_representation.SARN import SARN
 from veccity.upstream.road_representation.Toast import Toast
 from veccity.upstream.road_representation.START import START
 from veccity.upstream.road_representation.HRNR import HRNR
+from veccity.upstream.road_representation.JGRM import JGRM
+
 __all__ = [
     "ChebConv",
     "LINE",
@@ -24,5 +26,6 @@ __all__ = [
     "SARN",
     "Toast",
     "START",
-    "HRNR"
+    "HRNR",
+    "JGRM",
 ]
