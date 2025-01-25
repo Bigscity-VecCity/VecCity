@@ -1,0 +1,19 @@
+{
+    "num_epochs": 20,
+    "learning_rate": 3e-3,
+    "warmup_step": 1000,
+    "weight_decay": 1e-6,
+    "road_feat_num": 1,
+    "road_embed_size": 128,
+    "gps_feat_num": 2,
+    "gps_embed_size": 128,
+    "route_embed_size": 128,
+    "hidden_size": 256,
+    "mask_length": 2,
+    "mask_prob": 0.2,
+    "drop_route_rate": 0.1,
+    "drop_edge_rate": 0.1,
+    "drop_road_rate": 0.1,
+    "mode": "x"
+  }
+  

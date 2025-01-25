@@ -1,0 +1,11 @@
+{
+    "vocab_size": 11095,
+    "num_samples": 1000,
+    "retrain": 1,
+    "batch_size":8,
+    "num_workers":0,
+    "route_min_len": 10,
+    "route_max_len": 100,
+    "gps_min_len": 10,
+    "gps_max_len": 256
+}
