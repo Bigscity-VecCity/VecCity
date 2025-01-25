@@ -631,6 +631,45 @@ class JGRM(AbstractReprLearningModel):
 
         return loss
 
+    def encode(self, batch):
+        (
+            gps_road_rep,
+            gps_traj_rep,
+            route_road_rep,
+            route_traj_rep,
+            gps_road_joint_rep,
+            gps_traj_joint_rep,
+            route_road_joint_rep,
+            route_traj_joint_rep,
+            masked_route_assign_mat,
+            masked_gps_assign_mat,
+        ) = self.predict(batch)
+        return route_traj_joint_rep
+
+    def encode_all(self, batch):
+        (
+            gps_road_rep,
+            gps_traj_rep,
+            route_road_rep,
+            route_traj_rep,
+            gps_road_joint_rep,
+            gps_traj_joint_rep,
+            route_road_joint_rep,
+            route_traj_joint_rep,
+            masked_route_assign_mat,
+            masked_gps_assign_mat,
+        ) = self.predict(batch)
+        return (
+            gps_road_rep,
+            gps_traj_rep,
+            route_road_rep,
+            route_traj_rep,
+            gps_road_joint_rep,
+            gps_traj_joint_rep,
+            route_road_joint_rep,
+            route_traj_joint_rep,
+        )
+
 
 # GAT
 class GraphEncoder(nn.Module):
