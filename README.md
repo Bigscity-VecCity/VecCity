@@ -21,6 +21,12 @@
 
 Official repository of under review paper "*VecCity*: A Taxonomy-guided Library for Map Entity Representation Learning". Please star, watch, and fork our repo for the active updates!
 
+## News
+Coming Soon:
+1. We are adding JGRM, R2Vec, CatEM, and CAPE to further enhance our library.
+2. New tasks, such as land usage analysis and crime prediction, will also be introduced.
+3. We will launch a new interface that supports standard input formats. For more details, please visit this [link](placeholder).
+
 ## 1. Overview
 <div align="center">
   <img src="./figures/pipeline.jpg" width="500">
