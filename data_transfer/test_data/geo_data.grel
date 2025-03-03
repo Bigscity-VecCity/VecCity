@@ -1,0 +1,7 @@
+rel_id,type,orig_geo_id,dest_geo_id,rel_type,weight
+0,geospatial relationship,poi_6,parcel_2,POI2Region,0.2608677563611882
+1,geospatial relationship,poi_0,parcel_1,POI2Region,2.2110670380527884
+2,geospatial relationship,poi_9,parcel_2,POI2Region,0.3336002630273845
+3,geospatial relationship,road_0,poi_6,Road2POI,2.1643850149208115
+4,geospatial relationship,parcel_0,poi_2,Region2POI,2.583750285615951
+5,geospatial relationship,road_3,road_0,Road2Road,1.0
