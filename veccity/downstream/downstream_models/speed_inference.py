@@ -24,8 +24,8 @@ class SpeedInferenceModel(AbstractModel):
         self.data_path = './raw_data/' + self.dataset + '/'
         data_cache_dir = os.path.join(cache_dir, self.dataset)
         self.min_freq=config.get('min_freq',1)
-        self.vocab_path = data_cache_dir+'/vocab_{}_True_{}.pkl'.format(self.dataset, self.min_freq)
-        self.vocab = WordVocab.load_vocab(self.vocab_path)
+        # self.vocab_path = data_cache_dir+'/vocab_{}_True_{}.pkl'.format(self.dataset, self.min_freq)
+        # self.vocab = WordVocab.load_vocab(self.vocab_path)
         self.choice=config.get('choice',0)
 
     def run(self, x, label):
@@ -46,19 +46,6 @@ class SpeedInferenceModel(AbstractModel):
             test_index = list(test_index)
             X_train, X_test = x[train_index], x[test_index]
             y_train, y_test = y[train_index], y[test_index]
-
-            if choice <100:
-                cur_lens=len(X_train)
-                k=int(cur_lens*choice/100)
-                index_range=list(range(cur_lens))
-                select_index=random.choices(index_range,k=k)
-                X_train=X_train[select_index]
-                y_train=y_train[select_index]
-                if i==0:
-                    print(f"do choice with {choice}%")
-                    print(f"befor is {cur_lens}")
-                    after=len(X_train)
-                    print(f"after is {after}")
 
             reg = linear_model.Ridge(alpha=self.alpha)
             X_train = np.array(X_train, dtype=float)

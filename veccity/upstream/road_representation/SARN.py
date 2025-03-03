@@ -59,6 +59,7 @@ class SARN(AbstractReprLearningModel):
         self.osm_data = OSMLoader(self.dataset_path, schema = 'SARN', device=self.device)
         self.osm_data.load_cikm_data(self.dataset)
         self.model = 'SARN'
+        self.output_dim = config.get('output_dim', 128)
        
         self.sarn_seg_feat_dim = config.get("sarn_seg_feat_dim", 176)
         assert self.sarn_seg_feat_dim % 4 == 0
@@ -158,15 +159,15 @@ class SARN(AbstractReprLearningModel):
                 _time_batch = time.time()
                 
                 optimizer.zero_grad()
-                (sub_seg_feats_1, sub_edge_index_1, mapping_to_origin_idx_1), \
-                        (sub_seg_feats_2, sub_edge_index_2, mapping_to_origin_idx_2), \
+                (sub_seg_feats_1, sub_edge_index_1, mapping_to_orig_geo_idx_1), \
+                        (sub_seg_feats_2, sub_edge_index_2, mapping_to_orig_geo_idx_2), \
                         sub_seg_ids, sub_cellids = batch
 
                 sub_seg_feats_1 = self.feat_emb(sub_seg_feats_1)
                 sub_seg_feats_2 = self.feat_emb(sub_seg_feats_2)
 
-                model_rtn = self.model(sub_seg_feats_1, sub_edge_index_1, mapping_to_origin_idx_1, \
-                                        sub_seg_feats_2, sub_edge_index_2, mapping_to_origin_idx_2, \
+                model_rtn = self.model(sub_seg_feats_1, sub_edge_index_1, mapping_to_orig_geo_idx_1, \
+                                        sub_seg_feats_2, sub_edge_index_2, mapping_to_orig_geo_idx_2, \
                                         sub_cellids, sub_seg_ids)
                 loss = self.model.loss_mtl(*model_rtn, self.sarn_moco_loss_local_weight, self.sarn_moco_loss_global_weight)
 
@@ -211,7 +212,7 @@ class SARN(AbstractReprLearningModel):
         logging.info("enc_train_time:{} \n enc_train_gpu:{} \n enc_train_ram:{} \n".format(time.time()-training_starttime, training_gpu_usage, training_ram_usage))
 
 
-    def finetune_forward(self, sub_seg_idxs, is_training: bool):
+    def encode(self, sub_seg_idxs, is_training: bool):
         if is_training:
             self.feat_emb.train()
             self.model.train()
@@ -241,14 +242,14 @@ class SARN(AbstractReprLearningModel):
                             else n_segs
             sub_seg_idx = seg_idxs[cur_index: end_index]
 
-            sub_edge_index_1, new_x_idx_1, mapping_to_origin_idx_1 = \
+            sub_edge_index_1, new_x_idx_1, mapping_to_orig_geo_idx_1 = \
                                 edge_index_1.sub_edge_index(sub_seg_idx)
             sub_seg_feats_1 = self.seg_feats[new_x_idx_1]
             sub_seg_feats_1 = sub_seg_feats_1.to(self.device)
             sub_edge_index_1 = torch.tensor(sub_edge_index_1, dtype = torch.long, device = self.device)
             
             if edge_index_2 != None:
-                sub_edge_index_2, new_x_idx_2, mapping_to_origin_idx_2 = \
+                sub_edge_index_2, new_x_idx_2, mapping_to_orig_geo_idx_2 = \
                                     edge_index_2.sub_edge_index(sub_seg_idx)
                 sub_seg_feats_2 = self.seg_feats[new_x_idx_2]
                 sub_seg_feats_2 = sub_seg_feats_2.to(self.device)
@@ -259,11 +260,11 @@ class SARN(AbstractReprLearningModel):
                 sub_seg_ids = torch.tensor(sub_seg_ids, dtype = torch.long, device = self.device)
                 sub_cellids = torch.tensor(sub_cellids, dtype = torch.long, device = self.device)
                 
-                yield (sub_seg_feats_1, sub_edge_index_1, mapping_to_origin_idx_1), \
-                        (sub_seg_feats_2, sub_edge_index_2, mapping_to_origin_idx_2), \
+                yield (sub_seg_feats_1, sub_edge_index_1, mapping_to_orig_geo_idx_1), \
+                        (sub_seg_feats_2, sub_edge_index_2, mapping_to_orig_geo_idx_2), \
                         sub_seg_ids, sub_cellids
             else:
-                yield sub_seg_feats_1, sub_edge_index_1, mapping_to_origin_idx_1
+                yield sub_seg_feats_1, sub_edge_index_1, mapping_to_orig_geo_idx_1
 
             cur_index = end_index
     
@@ -291,11 +292,11 @@ class SARN(AbstractReprLearningModel):
         with torch.no_grad():
             for i_batch, batch in enumerate(self.__train_data_generator_batchi(edge_index_1, None, shuffle = False)):
                     
-                sub_seg_feats_1, sub_edge_index_1, mapping_to_origin_idx_1 = batch
+                sub_seg_feats_1, sub_edge_index_1, mapping_to_orig_geo_idx_1 = batch
                 sub_seg_feats_1 = self.feat_emb(sub_seg_feats_1)
 
                 emb = self.model.encoder_q(sub_seg_feats_1, sub_edge_index_1)
-                emb = emb[mapping_to_origin_idx_1]
+                emb = emb[mapping_to_orig_geo_idx_1]
                 embs = torch.cat((embs, emb), 0)
 
             embs = F.normalize(embs, dim = 1) # dim=0 feature norm, dim=1 obj norm

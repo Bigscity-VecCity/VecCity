@@ -14,11 +14,18 @@
   <a href="#3-dataset-illstration">Dataset Illstration</a> •
   <a href="#4-how-to-run">How to Run</a> •
   <a href="#5-directory-structure">Directory Structure</a> •
-  <a href="#6-citation">Citation</a> 
+  <a href="#6-citation">Citation</a> •
+  <a href="https://arxiv.org/abs/2411.00874" title="arxiv">arXiv</a>
 </p>
 </div>
 
-Official repository of under review paper "*VecCity*: A Taxonomy-guided Library for Map Entity Representation Learning". Please star, watch and fork our repo for the active updates!
+Official repository of under review paper "*VecCity*: A Taxonomy-guided Library for Map Entity Representation Learning". Please star, watch, and fork our repo for the active updates!
+
+## News
+Coming Soon:
+1. We are adding JGRM, R2Vec, CatEM, and CAPE to further enhance our library.
+2. New tasks, such as land usage analysis and crime prediction, will also be introduced.
+3. We will launch a new interface that supports standard input formats. 
 
 ## 1. Overview
 <div align="center">
@@ -26,10 +33,10 @@ Official repository of under review paper "*VecCity*: A Taxonomy-guided Library 
 </div>
 
 *VecCity* is an open-sourced and standardized benchmark compatible with various datasets and baseline models. The above figure illustrates the arcitecture of VecCity. 
-For a given dataset, we first construct atomic files from multi-sourced city data by extracting and map entities (e.g., POIs, road segments, land parcels, etc.) and auxiliary data into corresponding atomic files. 
+For a given dataset, we first construct atomic files from multi-sourced city data by extracting and mapping entities (e.g., POIs, road segments, land parcels, etc.) and auxiliary data into corresponding atomic files. 
 MapRL models encodes various entities in a unified configuration, which facilitates joint processing for various downstream tasks.
 ## 2. Quick Starting
-### Step 1: Create a python 3.9 environment and install dependencies:
+### Step 1: Create a Python 3.9 environment and install dependencies:
 
 ```
 conda create -n VecCity python=3.9
@@ -44,21 +51,21 @@ pip install -r ./requirements.txt
 
 ### Step 3: Download processed data:
 
-You can also follow the instraction to [download processed city data](https://bhpan.buaa.edu.cn/link/AA904DB8317D61423995CA009146E0AF33) or process your own dataset.
+You can also follow the instructions to download processed city data from [bhpan](https://bhpan.buaa.edu.cn/link/AA904DB8317D61423995CA009146E0AF33), [Google Drive](https://drive.google.com/file/d/1JqnGsprG2zpJ4tisf0o3liOLy3GR7t0i/view?usp=drive_link) or process your own dataset.
 
 ### Step 4: Run a training pipeline for MapRL models:
 
 ```
-python run_model.py --task poi --dataset nyc --model CTLE --exp_uid CTLE 
+python run_model.py --task poi --dataset nyc --model CTLE --exp_id CTLE 
 ```
 
-## 3. Dataset Illstration
-We opensource nine city datasets in New York, Chicago, Tokyo, San Francisco, Porto, Beijing, Chendu, and Xi'an compatible with atomic files. 
+## 3. Dataset Illustration
+We open-source nine city datasets in New York, Chicago, Tokyo, San Francisco, Porto, Beijing, Chengdu, and Xi'an compatible with atomic files. 
 As the original dataset is quite large, we have included example data, data processing code, and model code to assist researchers in understanding our work. 
-The complete data sources can be found on [Beihang Pan](https://bhpan.buaa.edu.cn/link/AA904DB8317D61423995CA009146E0AF33).
+The complete data sources can be found on [Beihang Pan](https://bhpan.buaa.edu.cn/link/AA904DB8317D61423995CA009146E0AF33) or [Google Drive](https://drive.google.com/file/d/1JqnGsprG2zpJ4tisf0o3liOLy3GR7t0i/view?usp=drive_link).
 
 The above dataset construction scheme is highly reusable, one can prepare their own city data and use our code to build their personalized MapRL dataset easily. 
-We will provide a detailed explanation for our data and pre-processing module in the following. 
+We will provide a detailed explanation of our data and pre-processing module in the following. 
 
 #### 3.1 City Data
 
@@ -75,7 +82,7 @@ We will provide a detailed explanation for our data and pre-processing module in
 | XA  | 19,108 | 5,269   | 1,056  | -        | 384,618   | 54,365 |
 
 
-We store the original unprocessed files in the [Beihang Pan](https://bhpan.buaa.edu.cn/link/AA904DB8317D61423995CA009146E0AF33) (You can find the detail of preprocess in README file which is placed in the city dataset dir).  After proprocessing, the original dataset will be storaged in atomic files.
+We store the original unprocessed files in the [Beihang Pan](https://bhpan.buaa.edu.cn/link/AA904DB8317D61423995CA009146E0AF33) or [Google Drive](https://drive.google.com/file/d/1JqnGsprG2zpJ4tisf0o3liOLy3GR7t0i/view?usp=drive_link) (You can find the detail of preprocess in README file which is placed in the city dataset dir).  After proprocessing, the original dataset will be storaged in atomic files.
 Our city dataset construction scheme is highly reusable. You can prepare your own data following either the file format in *atomic files*. This flexibility allows you to adapt the construction process to various cities and datasets easily.
 
 
@@ -85,50 +92,52 @@ The following types of atomic files are defined:
 
 | filename    | content                                  | example                                  |
 | ----------- | ---------------------------------------- | ---------------------------------------- |
-| xxx.geo     | Each line in the file represents a map entity | geo_uid, geo_type, geo_location, geo_features|
-| xxx.grel     | Each line of the file records a non-zero geographic relations between two map entity. | rel_uid, ori_geo_uid, des_geo_uid, wight, feature, timestamp|
-| xxx.srel     | Store the relationship information between entities, such as areas. | rel_uid, type, origin_uid, destination_uid  |
-| xxx.citraj    |  Each line of the file corresponds to a sample of a check-in trajectory. | traj_uid, sample_uid, entity_uid, timestamp |
-| xxx.cdtraj    | Each line of the file corresponds to a sample of a coordinate trajectory. | traj_uid, sample_uid, entity_uid, timestamp |
-| config.json | Used to store the config settings for data precessing. |                                          |
+| xxx.geo     | Each line in the file represents a map entity | geo_uid, type, geo_location, geo_features|
+| xxx.grel     | Each line of the file records a non-zero geographic relation between two map entities. | rel_uid, ori_geo_id, des_geo_id, weight, feature, timestamp|
+| xxx.srel     | Store the relationship information between entities, such as areas. | rel_uid, type, orig_geo_id, dest_geo_id,weight  |
+| xxx.citraj    |  Each line of the file corresponds to a sample of a check-in trajectory. | traj_uid, sample_order, user_id, geo_id, time |
+| xxx.cdtraj    | Each line of the file corresponds to a sample of a coordinate trajectory. | traj_uid, sample_order, user_id, geo_id, time |
+| config.json | Used to store the config settings for data processing. |                                          |
 
 we explain the above four atomic files as follows:
 
 **xxx.geo**: An element in the entity table consists of the following four parts:
 
-**geo_uid, geo_type, geo_location, geo_features(multiple columns).**
+**geo_uid, geo_type, 'geo_location', geo_features(multiple columns).**
 
 ```
 geo_uid: This field records the unique ID for map entities.
-geo_type: This field recodes the entity's type, of which the value can be ``point'', ``polyline'' or ``polygon'', corresponding to POIs, road segments, and land parcels.
+type: This field recodes the entity's type, of which the value can be ``point'', ``polyline'' or ``polygon'', corresponding to POIs, road segments, and land parcels.
 geo_location: This field stores the geographical coordinates of a map entity: a single longitude and latitude for point entities, a sequence of coordinates for polylines, and a closed sequence of coordinates for polygons.
 geo_features (optional): This field stores the features of a map entity, with the format and length of this field varying based on the data type and number of features.
 ```
 
-**xxx.grel or xxx.srel**: An element in the ralationship table consists of the following six parts:
+**xxx.grel or xxx.srel**: An element in the relationship table consists of the following six parts:
 
-**rel_uid, ori_geo_uid, des_geo_uid, wight, feature(multiple columns), timestamp.**
+**rel_uid, orig_geo_id, dest_geo_id, wight, feature(multiple columns), time.**
 
 ```
 rel_uid: This field records the unique ID for a relationship between two map entities.
 ori_geo_uid & des_geo_uid: These two fields indicate the uIDs of the origin and destination map entities of a relation, with values matching the geo_uid listed in the *.geo* file.
-wight: This field recodes the weight of the edge corresponding to a map entity relation.
-feature (optional): This field stores additional features for a relation network edge. In some \rl models, relation networks are modeled as heterogeneous graph. This field can be used to store the type of heterogeneous edges. 
-timestamp (optional): This field stores timestamps for a relation and is essential for dynamic graphs, where edge weights and features correspond to the edge state during a specific time period.
+wight (optional): This field recodes the weight of the edge corresponding to a map entity relation.
+feature (optional): This field stores additional features for a relation network edge. In some MapRL models, relation networks are modeled as heterogeneous graphs. This field can be used to store the type of heterogeneous edges. 
+time (optional): This field stores timestamps for a relation and is essential for dynamic graphs, where edge weights and features correspond to the edge state during a specific time period.
 ```
 
 **xxx.citraj or xxx.cdtraj**: An element in the trajectory table consists of the following four parts:
 
-**traj_uid, sample_uid, entity_uid, timestamp**.
+**traj_uid, sample_order, user_id, geo_id, time, vflag**.
 
 ```
 traj_uid: The field specifies the unique ID of a trajectory that samples belong to.
-sample_uid: The field records the order index of a sample within a trajectory.
-entity_id: The field indicates the map entity to which a sample corresponds, with its value matching the *geo_uid* of the map entity listed in the *.geo* file.
+sample_order: The field records the order index of a sample within a trajectory.
+user_id: The field indicates the user who generates this record.
+geo_id: The field indicates the map entity to which a sample corresponds, with its value matching the *geo_uid* of the map entity listed in the *.geo* file.
 timestamp: The field stores a trajectory sample's timestamp, which is in the format of Unix timestamps.
+vflag (optional): whether the taxi has passengers.
 ```
 
-**xxx.config**: The config file is used to supplement the settings for data preprocessing.
+**config.json**: The config file is used to supplement the settings for data preprocessing.
 
 
 ## 4. How to Run
@@ -140,20 +149,20 @@ To train and evaluate a MapRL model, use the run_model.py script:
 ```bash
 python ./run_model.py 
   -h, --help            show this help message and exit
-  --task TASK           the name of task [poi,segment,parcel]
-  --model MODEL         the name of model
-  --dataset DATASET     the name of dataset [nyc, tokyo, chicago, sf, porto, bj, cd, xa]
+  --task TASK           the name of task [poi, segment,parcel]
+  --model MODEL         the name of the model
+  --dataset DATASET     the name of the dataset [nyc, tyo, chi, sin, sf, prt, bj, cd, xa]
   --config_file CONFIG_FILE
-                        the file name of config file
+                        the file name of the config file
   --saved_model SAVED_MODEL
                         whether save the trained model
   --train TRAIN         whether re-train model if the model is trained before
   --exp_id EXP_ID       id of experiment
   --seed SEED           random seed
   --save_result SAVE_RESULT
-                        save result or not
+                        save the result or not
   --gpu GPU             whether use gpu
-  --gpu_id GPU_ID       the gpu id to use
+  --gpu_id GPU_ID       the GPU id to use
   --batch_size BATCH_SIZE
                         the batch size
   --learning_rate LEARNING_RATE
@@ -176,7 +185,7 @@ To train and evaluate a MapRL model on downstream tasks, use the run_model.py sc
 ```bash
 python run_model.py --task poi --model CTLE --dataset nyc --exp_id [exp_id] --train false
 ```
-This script will run the CTLE model on the nyc dataset for downstream tasks of poi entity under the default configuration.
+This script will run the CTLE model on the nyc dataset for downstream tasks of the poi entity under the default configuration.
 
 ## 5 Directory Structure
 
@@ -226,7 +235,7 @@ If you find our work is useful for your research, please consider citing:
 ```bash
 @article{zhang2024vec,
   title={VecCity: A Taxonomy-guided Library for Map Entity Representation Learning},
-  author={Zhang, Wentao and Wang, jingyuan and U, Leonhou},
+  author={Zhang, Wentao and Wang, jingyuan and Yang, Yifan and U, Leonhou},
   journal={arxiv},
   year={2024}
 }

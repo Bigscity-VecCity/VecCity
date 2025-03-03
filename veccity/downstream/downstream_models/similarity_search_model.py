@@ -28,16 +28,16 @@ def build_graph(rel_file, geo_file):
     edge2len = {}
     geoid2coord = {}
     for i, row in tqdm(geo.iterrows(), total=geo.shape[0]):
-        geo_id = row.geo_id
+        geo_uid = row.geo_uid
         length = float(row.length)
-        edge2len[geo_id] = length
-        # geoid2coord[geo_id] = row.coordinates
+        edge2len[geo_uid] = length
+        # geoid2coord[geo_uid] = row.coordinates
 
     graph = nx.DiGraph()
 
     for i, row in tqdm(rel.iterrows(), total=rel.shape[0]):
-        prev_id = row.origin_id
-        curr_id = row.destination_id
+        prev_id = row.orig_geo_id
+        curr_id = row.dest_geo_id
 
         # Use length as weight
         # weight = geo.iloc[prev_id].length
@@ -67,10 +67,11 @@ class TrajEncoder(nn.Module):
         # valid_len=batch['lengths']
         padding_masks=batch['padding_masks']
         
-        original_shape = path.shape  # [batch_size, traj_len]
-        full_embed = [torch.from_numpy(self.embedding[int(i)]).to(torch.float32) for i in path.reshape(-1)]
-        full_embed = torch.stack(full_embed)
-        full_embed = full_embed.view(*original_shape, self.input_dim).to(self.device)  # [batch_size, traj_len, embed_size]
+        # original_shape = path.shape  # [batch_size, traj_len]
+        # full_embed = [torch.from_numpy(self.embedding[int(i)]).to(torch.float32) for i in path.reshape(-1)]
+        # full_embed = torch.stack(full_embed)
+        # full_embed = full_embed.view(*original_shape, self.input_dim).to(self.device)  # [batch_size, traj_len, embed_size]
+        full_embed = self.embedding.encode(path)
         # pack_x = pack_padded_sequence(full_embed, lengths=valid_len, batch_first=True, enforce_sorted=False).to(self.device)
         h0 = torch.zeros(self.n_layers, full_embed.size(0), self.hidden_dim).to(self.device)
         c0 = torch.zeros(self.n_layers, full_embed.size(0), self.hidden_dim).to(self.device)
@@ -109,13 +110,13 @@ class STSModel(nn.Module):
         # similarity_matrix = F.cosine_similarity(out_view1.unsqueeze(1), out_view2.unsqueeze(0), dim=-1)
         similarity_matrix = torch.cdist(out_view1,out_view2)
         # 分类loss，轨迹模型精度下降
-        labels = torch.arange(similarity_matrix.shape[0]).long().to(self.device)
-        loss_res = self.criterion(similarity_matrix, labels)
+        # labels = torch.arange(similarity_matrix.shape[0]).long().to(self.device)
+        # loss_res = self.criterion(similarity_matrix, labels)
         # 二分类loss，只计算对角线的对错
-        # index=torch.eye(similarity_matrix.shape[0]).bool()
-        # preds=similarity_matrix[index]
-        # labels=torch.ones(similarity_matrix.shape[0]).to(self.device)
-        # loss_res=self.criterion(preds,labels)
+        index=torch.eye(similarity_matrix.shape[0]).bool()
+        preds=similarity_matrix[index]
+        labels=torch.ones(similarity_matrix.shape[0]).to(self.device)
+        loss_res=self.criterion(preds,labels)
         return loss_res
 
 class SimilaritySearchModel(AbstractModel):
@@ -133,9 +134,8 @@ class SimilaritySearchModel(AbstractModel):
     
     def run(self,model,**kwargs):
         self._logger.info("-------- STS START --------")
-        self.evaluation()
+        # self.evaluation()
         self.train(model,**kwargs)
-        
         return self.result
 
     def train(self,model,**kwargs):
@@ -151,6 +151,7 @@ class SimilaritySearchModel(AbstractModel):
         best_model=None
         best_epoch=0
         self.model.train()
+
         for epoch in range(self.epochs):
             total_loss = 0.0
             for step,(batch1,batch2) in enumerate(zip(self.train_ori_dataloader,self.train_qry_dataloader)):
@@ -174,7 +175,7 @@ class SimilaritySearchModel(AbstractModel):
             valid_loss=valid_loss/len(self.test_ori_dataloader)
 
             if best_loss==-1 or valid_loss<best_loss:
-                best_model=copy.deepcopy(self.model)
+                best_model=copy.copy(self.model)
                 best_loss=valid_loss
                 best_epoch=epoch
             self._logger.info("epoch {} complete! training loss {:.2f}, valid loss {:2f}, best_epoch {}, best_loss {:2f}".format(epoch, total_loss, valid_loss,best_epoch,best_loss))

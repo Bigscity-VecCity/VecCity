@@ -226,9 +226,9 @@ def generate_road_representaion_downstream_data(dataset_name):
         for index, row in geo_df.iterrows():
             if row['traffic_type'] == 'road':
                 try:
-                    coordinates = eval(row['coordinates'])
+                    coordinates = eval(row['geo_location'])
                 except:
-                    coordinates = wkt.loads(row['coordinates']).coords[:]
+                    coordinates = wkt.loads(row['geo_location']).coords[:]
                 geo2length[row['road_id']] = geo2distance(coordinates)
             elif row['traffic_type'] == 'poi':
                 break
@@ -243,19 +243,19 @@ def generate_road_representaion_downstream_data(dataset_name):
         geo2lengthdf = pd.read_csv(os.path.join(save_data_path, 'length.csv'))
         geo2length = dict(zip(geo2lengthdf['road_id'], geo2lengthdf['length']))
         geo2speed = {}
-        lst_traj_id, lst_entity_id = -1, -1
+        lst_traj_uid, lst_user_id = -1, -1
         traj_list = []
         trajAndtime = []
         for chunk in tqdm(traj_df_reader):
             for index, row in chunk.iterrows():
                 if row['geo_id'] - num_regions not in geo2length.keys():
                     continue
-                traj_id, entity_id = int(row['traj_id']), int(row['entity_id'])
-                if (traj_id != lst_traj_id or entity_id != lst_entity_id) and traj_list != []:
+                traj_uid, user_id = int(row['traj_uid']), int(row['user_id'])
+                if (traj_uid != lst_traj_uid or user_id != lst_user_id) and traj_list != []:
                     trajs, time = getSpeedAndTime(traj_list, geo2length, geo2speed, num_regions)
                     trajAndtime.append([trajs, time])
-                    lst_traj_id = traj_id
-                    lst_entity_id = entity_id
+                    lst_traj_uid = traj_uid
+                    lst_user_id = user_id
                     traj_list = [row]
                 else:
                     traj_list.append(row)

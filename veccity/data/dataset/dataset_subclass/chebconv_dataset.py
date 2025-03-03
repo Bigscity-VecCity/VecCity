@@ -48,22 +48,22 @@ class ChebConvDataset(AbstractDataset):
 
     def _load_geo(self):
         """
-        加载.geo文件，格式[geo_id, type, coordinates, properties(若干列)]
+        加载.geo文件，格式[geo_uid, type, coordinates, properties(若干列)]
         """
         geofile = pd.read_csv(self.data_path + self.geo_file + '.geo')
-        self.geo_ids = list(geofile['geo_id'])
-        # self.num_nodes = len(self.geo_ids)
+        self.geo_uids = list(geofile['geo_uid'])
+        # self.num_nodes = len(self.geo_uids)
         self.num_nodes = geofile[geofile['traffic_type'] == 'road'].shape[0]
         self.num_regions = geofile[geofile['traffic_type'] == 'region'].shape[0]
         self.geo_to_ind = {}
-        for index, idx in enumerate(self.geo_ids):
+        for index, idx in enumerate(self.geo_uids):
             self.geo_to_ind[idx] = index
-        self._logger.info("Loaded file " + self.geo_file + '.geo' + ', num_nodes=' + str(len(self.geo_ids)))
+        self._logger.info("Loaded file " + self.geo_file + '.geo' + ', num_nodes=' + str(len(self.geo_uids)))
         self.road_info = geofile
 
     def _load_rel(self):
         """
-        加载.rel文件，格式[rel_id, type, origin_id, destination_id, properties(若干列)],
+        加载.rel文件，格式[rel_uid, type, orig_geo_id, dest_geo_id, properties(若干列)],
         生成N*N的矩阵，默认.rel存在的边表示为1，不存在的边表示为0
 
         Returns:
@@ -78,9 +78,9 @@ class ChebConvDataset(AbstractDataset):
         adj_set = set()
         cnt = 0
         for i in range(map_info.shape[0]):
-            if map_info['origin_id'][i] in self.geo_to_ind and map_info['destination_id'][i] in self.geo_to_ind:
-                f_id = self.geo_to_ind[map_info['origin_id'][i]] - self.num_regions
-                t_id = self.geo_to_ind[map_info['destination_id'][i]] - self.num_regions
+            if map_info['orig_geo_id'][i] in self.geo_to_ind and map_info['dest_geo_id'][i] in self.geo_to_ind:
+                f_id = self.geo_to_ind[map_info['orig_geo_id'][i]] - self.num_regions
+                t_id = self.geo_to_ind[map_info['dest_geo_id'][i]] - self.num_regions
                 if (f_id, t_id) not in adj_set:
                     adj_set.add((f_id, t_id))
                     adj_row.append(f_id)
@@ -96,7 +96,7 @@ class ChebConvDataset(AbstractDataset):
     def _split_train_val_test(self):
         node_features = pd.read_csv(os.path.join(cache_dir, self.dataset, 'road.csv'))
         drop_features = ['id', 'geometry', 'u', 'v', 's_lon', 's_lat', 
-             'e_lon', 'e_lat', 'm_lon', 'm_lat', 'coordinates',
+             'e_lon', 'e_lat', 'm_lon', 'm_lat', 'geo_location',
              'type']
         for drop_feature in drop_features:
             if drop_feature in node_features.keys():

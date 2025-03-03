@@ -285,8 +285,8 @@ class HyperRoadDataset(AbstractDataset):
         df = pd.read_csv(os.path.join(self.data_path, self.dataset + '.grel'))
         road2region_df = df[df['rel_type'] == 'road2region']
         for _, row in road2region_df.iterrows():
-            x = int(row['origin_id']) - self.region_num
-            y = int(row['destination_id'])
+            x = int(row['orig_geo_id']) - self.region_num
+            y = int(row['dest_geo_id'])
             hyper_adj[x][y] = 1
         return hyper_adj
     

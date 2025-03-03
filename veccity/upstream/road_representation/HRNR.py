@@ -39,7 +39,7 @@ class HRNR(AbstractReprLearningModel):
         hparams.lane_num=data_feature.get("lane_num")
         hparams.length_num=data_feature.get("length_num")
         hparams.type_num=data_feature.get("type_num")
-        hparams.node_num=data_feature.get("num_nodes")
+        hparams.node_num=data_feature.get("num_nodes")# 引入padding
 
         edge = self.adj.indices()
         edge_e = torch.ones(edge.shape[1], dtype=torch.float).to(self.device)
@@ -57,22 +57,16 @@ class HRNR(AbstractReprLearningModel):
         self.road_embedding_path = './veccity/cache/{}/evaluate_cache/road_embedding_{}_{}_{}.npy'. \
             format(self.exp_id, self.model, self.dataset, self.output_dim)
 
-    def forward(self, x):
+    def encode(self, x):
         self.node_emb = self.graph_enc(self.node_feature, self.type_feature, self.length_feature, self.lane_feature, self.adj)
         self.init_emb = self.graph_enc.init_feat
-        output_state = torch.cat((self.node_emb[x], self.init_emb[x]), 1)
+        
+        output_state = torch.cat((self.node_emb[x], self.init_emb[x]), -1)
         output_state = self.linear(output_state)
+
         return output_state
-    
-    def encode(self, x, cal_grad=True):
-        with torch.set_grad_enabled(cal_grad):
-            return self.forward(x)
         
     def run(self, train_dataloader, eval_dataloader):
-        if True:
-            # 预训练任务在dataset中已经完成，获得了assign matrix
-            pass 
-
         self._logger.info("Starting training...")
         hparams = dict_to_object(self.config.config)
         ce_criterion = torch.nn.CrossEntropyLoss()
@@ -88,7 +82,7 @@ class HRNR(AbstractReprLearningModel):
                 model_optimizer.zero_grad()
                 train_set = train_set.clone().detach()
                 train_label = train_label.clone().detach()
-                pred = self(train_set)
+                pred = self.encode(train_set)
                 loss = ce_criterion(pred, train_label)
                 loss.backward(retain_graph=True)
                 torch.nn.utils.clip_grad_norm_(self.parameters(), hparams.lp_clip)
@@ -133,7 +127,7 @@ class HRNR(AbstractReprLearningModel):
         right = 0
         sum_num = 0
         test_set = test_set.clone().detach()
-        pred = self(test_set)
+        pred = self.encode(test_set)
         pred_prob = F.softmax(pred, -1)
         pred_scores = pred_prob[:, 1]
         auc = roc_auc_score(np.array(test_label), np.array(pred_scores.tolist()))

@@ -1,4 +1,4 @@
 {
-    "task_epoch":100,
+    "task_epoch":2,
     "evaluate_tasks":["sts"]
 }

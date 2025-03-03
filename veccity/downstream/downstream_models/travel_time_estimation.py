@@ -22,9 +22,7 @@ class TrajEncoder(nn.Module):
     def forward(self, path, valid_len):
         
         original_shape = path.shape  # [batch_size, traj_len]
-        
-        full_embed = [torch.from_numpy(self.embedding[int(i)]).to(torch.float32) for i in path.view(-1)]
-        full_embed = torch.stack(full_embed)
+        full_embed = self.embedding.encode(path)
         full_embed = full_embed.view(*original_shape, self.input_dim)  # [batch_size, traj_len, embed_size]
         pack_x = pack_padded_sequence(full_embed, lengths=valid_len.cpu(), batch_first=True, enforce_sorted=False).to(self.device)
         h0 = torch.zeros(self.n_layers, full_embed.size(0), self.hidden_dim).to(self.device)
@@ -43,7 +41,6 @@ class MLPReg(nn.Module):
 
         self.embedding = embedding
         self.lstm = TrajEncoder(input_dim, input_dim, 1, embedding, device)
-        
         
         self.layers = []
         self.layers.append(nn.Linear(input_dim, hidden_dim))
@@ -85,14 +82,12 @@ class TravelTimeEstimationModel(AbstractModel):
             format(self.exp_id, self.alpha, self.n_split)
         self.choice=config.get('choice',0)
 
-    def run(self, embedding_vector, label, embed_model=None,**kwargs):
-
+    def run(self, embedding_model, label, embed_model=None,**kwargs):
         self._logger.info("--- Time Estimation ---")
         min_len, max_len = self.config.get("tte_min_len", 10), self.config.get("tte_max_len", 128)
         dfs = label['time']
         num_samples = len(dfs)
-        padding_id = embedding_vector.shape[0]-1
-        embedding_vector = np.concatenate((embedding_vector, np.zeros((1, embedding_vector.shape[1]))), axis=0)
+        padding_id = 0
         x_arr = np.zeros([num_samples, max_len],dtype=np.int64)
         lens_arr = np.zeros([num_samples], dtype=np.int64)
         y_arr = np.zeros([num_samples], dtype=np.float32)
@@ -129,18 +124,12 @@ class TravelTimeEstimationModel(AbstractModel):
         eval_dataset = TimeEstimationDataset(eval_data_X,eval_lens,eval_data_y)
         test_dataset = TimeEstimationDataset(test_data_X,test_lens,test_data_y)
 
-        # just for test
-        # if self.choice:
-        #     train_dataset=random.choices(train_dataset,k=self.choice)
-        #     print(f'do random choice {self.choice}')
-
-
         train_dataloader= DataLoader(train_dataset,batch_size=128,shuffle=True,num_workers=4)
         eval_dataloader= DataLoader(eval_dataset,batch_size=128,shuffle=False,num_workers=4)
         test_dataloader= DataLoader(test_dataset,batch_size=128,shuffle=False,num_workers=4)
 
         
-        model = MLPReg(input_dim, hidden_dim, 2, nn.ReLU(), embedding_vector,is_static,device,max_len).to(device)
+        model = MLPReg(input_dim, hidden_dim, 2, nn.ReLU(), embedding_model,is_static,device,max_len).to(device)
 
         opt = torch.optim.Adam(model.parameters(),lr=1e-4)
         loss_fn=nn.MSELoss()

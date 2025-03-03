@@ -113,7 +113,7 @@ class TrafficRepresentationDataset(AbstractDataset):
         elif self.representation_object == "road":
             self.geo_to_ind = {}
             self.ind_to_geo = {}
-            for index, idx in enumerate(self.geo_ids):
+            for index, idx in enumerate(self.geo_uids):
                 self.geo_to_ind[idx] = index
                 self.ind_to_geo[index] = idx
 
@@ -124,19 +124,19 @@ class TrafficRepresentationDataset(AbstractDataset):
 
     def _load_geo(self):
         """
-        加载.geo文件，格式[geo_id, type, coordinates, function,traffic_type]
+        加载.geo文件，格式[geo_uid, type, coordinates, function,traffic_type]
         """
         geofile = pd.read_csv(self.data_path + self.geo_file + '.geo')
         self.geofile = geofile
         coordinates_list = geofile[geofile['traffic_type'] == 'region']['region_geometry']
         # l = coordinates_list if coordinates_list[0][0].isalpha() else [geojson2geometry(coordinate) for coordinate in coordinates_list]
         self.region_geometry = gpd.GeoSeries.from_wkt(coordinates_list)
-        self.geo_ids = list(geofile['geo_id'])
-        self.region_ids = list(geofile[geofile['traffic_type'] == 'region']['geo_id'])
+        self.geo_uids = list(geofile['geo_uid'])
+        self.region_ids = list(geofile[geofile['traffic_type'] == 'region']['geo_uid'])
         self.num_regions = len(self.region_ids)
-        self.road_ids = list(geofile[geofile['traffic_type'] == 'road']['geo_id'])
+        self.road_ids = list(geofile[geofile['traffic_type'] == 'road']['geo_uid'])
         self.num_roads = len(self.road_ids)
-        self.poi_ids = list(geofile[geofile['traffic_type'] == 'poi']['geo_id'])
+        self.poi_ids = list(geofile[geofile['traffic_type'] == 'poi']['geo_uid'])
         self.num_pois = len(self.poi_ids)
         if self.representation_object == "region":
             self.num_nodes = self.num_regions
@@ -150,7 +150,7 @@ class TrafficRepresentationDataset(AbstractDataset):
 
     def _load_rel(self):
         """
-        加载各个实体的联系，格式['rel_id','type','origin_id','destination_id','rel_type']
+        加载各个实体的联系，格式['rel_uid','type','orig_geo_id','dest_geo_id','rel_type']
         后续可能会将两种实体之间的对应做成1-->n的映射
         """
         relfile = pd.read_csv(self.data_path + self.rel_file + '.grel')
@@ -184,7 +184,7 @@ class TrafficRepresentationDataset(AbstractDataset):
         region_set = set()  # 记录所有在轨迹中出现过的区域
         for road_list in self.traj_road:
             for road in road_list:
-                region = list(self.road2region[self.road2region['origin_id'] == road]['destination_id'])[0]
+                region = list(self.road2region[self.road2region['orig_geo_id'] == road]['dest_geo_id'])[0]
                 region_set.add(region)
         index = 0
         for region in region_set:
@@ -225,10 +225,10 @@ class TrafficRepresentationDataset(AbstractDataset):
         region_set = set()  # 记录所有在od中出现过的区域
         for road_list in self.traj_road:
             road = road_list[0]
-            region = list(self.road2region[self.road2region['origin_id'] == road]['destination_id'])[0]
+            region = list(self.road2region[self.road2region['orig_geo_id'] == road]['dest_geo_id'])[0]
             region_set.add(region)
             road = road_list[-1]
-            region = list(self.road2region[self.road2region['origin_id'] == road]['destination_id'])[0]
+            region = list(self.road2region[self.road2region['orig_geo_id'] == road]['dest_geo_id'])[0]
             region_set.add(region)
         index = 0
         for region in region_set:
@@ -347,14 +347,14 @@ class TrafficRepresentationDataset(AbstractDataset):
         # 计算全量的od矩阵
         od_label = np.zeros((self.num_nodes, self.num_nodes), dtype=np.float32)
         for traj in self.traj_road:
-            origin_region = list(self.road2region[self.road2region['origin_id'] == traj[0]]['destination_id'])[0]
-            destination_region = list(self.road2region[self.road2region['origin_id'] == traj[-1]]['destination_id'])[0]
+            origin_region = list(self.road2region[self.road2region['orig_geo_id'] == traj[0]]['dest_geo_id'])[0]
+            destination_region = list(self.road2region[self.road2region['orig_geo_id'] == traj[-1]]['dest_geo_id'])[0]
             od_label[origin_region][destination_region] += 1
         self.geo_to_ind = {}
         self.ind_to_geo = {}
         poi_set = set()
         for region in range(self.num_regions):
-            if len(list(self.region2poi[self.region2poi["origin_id"] == region]["destination_id"])) > 0:
+            if len(list(self.region2poi[self.region2poi["orig_geo_id"] == region]["dest_geo_id"])) > 0:
                 poi_set.add(region)
         region_set = copy.copy(poi_set)
         stop = False

@@ -1,6 +1,6 @@
 {
     "batch_size":1024,
-    "max_epoch":100,
+    "max_epoch":2,
     "representation_object":"road",
     "learning_rate":1e-3,
     "embed_dim":128,
@@ -11,5 +11,7 @@
     "layer_num":4,
     "agg":"mean",
     "with_p":"True",
-    "weight_decay":1e-5
+    "weight_decay":1e-5,
+    "evaluate_tasks":["tte","tsi", "sts"],
+    "evaluate_models":["TravelTimeEstimationModel","SpeedInferenceModel","SimilaritySearchModel"]
 }

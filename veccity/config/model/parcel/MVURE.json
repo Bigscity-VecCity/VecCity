@@ -1,0 +1,6 @@
+{
+  "output_dim": 128,
+  "representation_object":"region",
+  "remove_node_type":"MVURE",
+  "evaluate_tasks":["FI","MI","LPC"]
+}

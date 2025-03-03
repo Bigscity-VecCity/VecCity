@@ -1,0 +1,7 @@
+{
+    "representation_object": "road",
+    "output_dim": 128,
+    "max_epoch": 100,
+    "evaluate_tasks":["tte","tsi", "sts"],
+    "evaluate_models":["TravelTimeEstimationModel","SpeedInferenceModel","SimilaritySearchModel"]
+}

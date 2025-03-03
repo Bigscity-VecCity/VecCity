@@ -81,5 +81,7 @@
     "unif_t": 2,
     "train_align_uniform": false,
     "test_align_uniform": true,
-    "norm_align_uniform": false
+    "norm_align_uniform": false,
+    "evaluate_tasks":["tte","tsi", "sts"],
+    "evaluate_models":["TravelTimeEstimationModel","SpeedInferenceModel","SimilaritySearchModel"]
   }

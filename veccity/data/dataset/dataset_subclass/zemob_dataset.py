@@ -83,14 +83,14 @@ class ZEMobDataset(AbstractDataset):
         od_file = pd.read_csv(os.path.join(cache_dir, self.dataset, 'od_region_train.csv'))
         for _, row in od_file.iterrows():
             # 得到起始zone和起始zone对应的mobility_event
-            origin_region = int(row['origin_id'])
+            origin_region = int(row['orig_geo_id'])
             origin_date = datetime.fromtimestamp(row['start_time'])
             origin_hour = origin_date.hour
             origin_date_type = 1 if origin_date.weekday() in range(5) else 0
             origin_mobility_event = (origin_region, origin_hour, origin_date_type, 'o')
 
             # 得到目的zone和目的zone对应的mobility_event
-            destination_region = int(row['destination_id'])
+            destination_region = int(row['dest_geo_id'])
             destination_date = datetime.fromtimestamp(row['end_time'])
             destination_hour = destination_date.hour
             destination_date_type = 1 if destination_date.weekday() in range(5) else 0

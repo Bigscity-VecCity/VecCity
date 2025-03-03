@@ -759,7 +759,7 @@ class CACSR(AbstractModel):
 #         venue_lng = [coord[2] for coord in data_feature['coor_mat']]
 #         venue_category = data_feature['coor_df']['category'].values
 #         category_cnt = len(set(venue_category))
-#         venueId_lidx = {venue: idx for idx, venue in enumerate(data_feature['coor_df']['geo_id'])}
+#         venueId_lidx = {venue: idx for idx, venue in enumerate(data_feature['coor_df']['geo_uid'])}
 #         if os.path.exists(ss_save_filename):
 #             ss = np.load(ss_save_filename)
 #             SS_distance = ss['SS_distance']

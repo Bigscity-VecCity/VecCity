@@ -120,7 +120,7 @@ class BaseDataset(AbstractDataset):
         self.logger.info("Loading Vocab from {}".format(self.vocab_path)) # 数据
         # if self.vocab==None:
         self.vocab = WordVocab.load_vocab(self.vocab_path)
-        self.selected_geo_ids=self.vocab.all_edge
+        self.selected_geo_uids=self.vocab.all_edge
         self.usr_num = self.vocab.user_num
         self.vocab_size = self.vocab.vocab_size
         self.logger.info('vocab_path={}, usr_num={}, vocab_size={}'.format(
@@ -128,19 +128,19 @@ class BaseDataset(AbstractDataset):
 
     def _load_geo(self):
         geofile = pd.read_csv(self.selected_path + self.geo_file + '.geo')
-        self.geo_ids = list(geofile['id'])
-        self.num_nodes = len(self.geo_ids)
+        self.geo_uids = list(geofile['id'])
+        self.num_nodes = len(self.geo_uids)
         self.geo_to_ind = {}
         self.ind_to_geo = {}
-        for index, geo_id in enumerate(self.geo_ids):
-            self.geo_to_ind[geo_id] = index
-            self.ind_to_geo[index] = geo_id
-        self._logger.info("Loaded file " + self.geo_file + '.geo' + ', num_nodes=' + str(len(self.geo_ids)))
+        for index, geo_uid in enumerate(self.geo_uids):
+            self.geo_to_ind[geo_uid] = index
+            self.ind_to_geo[index] = geo_uid
+        self._logger.info("Loaded file " + self.geo_file + '.geo' + ', num_nodes=' + str(len(self.geo_uids)))
         return geofile
 
     def _load_rel(self):
-        relfile = pd.read_csv(self.selected_path + self.rel_file + '.grel')[['origin_id', 'destination_id']]# 数据od
-        self.adj_mx = np.zeros((len(self.geo_ids), len(self.geo_ids)), dtype=np.float32)
+        relfile = pd.read_csv(self.selected_path + self.rel_file + '.grel')[['orig_geo_id', 'dest_geo_id']]# 数据od
+        self.adj_mx = np.zeros((len(self.geo_uids), len(self.geo_uids)), dtype=np.float32)
         for row in relfile.values:
             if row[0] not in self.geo_to_ind or row[1] not in self.geo_to_ind:
                 continue
@@ -187,9 +187,9 @@ class BaseDataset(AbstractDataset):
         self._logger.info('node_features: ' + str(node_features.shape))  # (N, fea_dim)
         node_fea_vec = np.zeros((self.vocab.vocab_size, node_features.shape[1]))
         for ind in range(len(node_features)):
-            geo_id = self.ind_to_geo[ind]
-            encoded_geo_id = self.vocab.loc2index[geo_id]
-            node_fea_vec[encoded_geo_id] = node_features[ind]
+            geo_uid = self.ind_to_geo[ind]
+            encoded_geo_uid = self.vocab.loc2index[geo_uid]
+            node_fea_vec[encoded_geo_uid] = node_features[ind]
         if self.normal_feature:
             self._logger.info('node_features by a/row_sum(a)')  # (vocab_size, fea_dim)
             row_sum = np.clip(node_fea_vec.sum(1), a_min=1, a_max=None)
@@ -337,7 +337,7 @@ class TrajectoryProcessingDataset(Dataset):
 
     def data_processing(self, origin_data, desc=None, cache_path=None, tmat_path=None):
         self._logger.info(f'Processing {self.data_type} dataset in TrajectoryProcessingDataset!')
-        sub_data = origin_data[['path', 'tlist', 'usr_id', 'traj_id']]
+        sub_data = origin_data[['path', 'tlist', 'usr_id', 'traj_uid']]
         traj_list = []
         temporal_mat_list = []
         for i in tqdm(range(sub_data.shape[0]), desc=desc):
@@ -414,21 +414,21 @@ def trans_probs(geo_path,rel_path,base_path,road_name,K,max_length,traj_train):
     geo = pd.read_csv(geo_path)
     print('Geo', geo.shape)
 
-    geo_ids = list(geo['id'])
-    num_nodes = len(geo_ids)
+    geo_uids = list(geo['id'])
+    num_nodes = len(geo_uids)
     geo_to_ind = {}
     ind_to_geo = {}
-    for index, geo_id in enumerate(geo_ids):
-        geo_to_ind[geo_id] = index
-        ind_to_geo[index] = geo_id
+    for index, geo_uid in enumerate(geo_uids):
+        geo_to_ind[geo_uid] = index
+        ind_to_geo[index] = geo_uid
 
     path = os.path.join(base_path, '{0}_neighbors_{1}.json'.format(road_name, K))
     if os.path.exists(path):
         geoid2neighbors = json.load(open(path, 'r'))
     else:
-        relfile = pd.read_csv(rel_path)[['origin_id', 'destination_id']]
+        relfile = pd.read_csv(rel_path)[['orig_geo_id', 'dest_geo_id']]
         print('Rel', relfile.shape)
-        adj_mx = np.zeros((len(geo_ids), len(geo_ids)), dtype=np.float32)
+        adj_mx = np.zeros((len(geo_uids), len(geo_uids)), dtype=np.float32)
         for row in relfile.values:
             if row[0] not in geo_to_ind or row[1] not in geo_to_ind:
                 continue
@@ -445,13 +445,13 @@ def trans_probs(geo_path,rel_path,base_path,road_name,K,max_length,traj_train):
         print('Finish sum of K order adj_mx')
         geoid2neighbors = {}
         for i in tqdm(range(len(adj_mx_bool)), desc='count neighbors'):
-            geo_id = int(ind_to_geo[i])
-            geoid2neighbors[geo_id] = []
+            geo_uid = int(ind_to_geo[i])
+            geoid2neighbors[geo_uid] = []
             for j in range(adj_mx_bool.shape[1]):
                 if adj_mx_bool[i][j] == 0:
                     continue
                 ner_id = int(ind_to_geo[j])
-                geoid2neighbors[geo_id].append(ner_id)
+                geoid2neighbors[geo_uid].append(ner_id)
         json.dump(geoid2neighbors, open(path, 'w'))
         print('Total edge@{} = {}'.format(1, adj_mx.sum()))
         print('Total edge@{} = {}'.format(K, adj_mx_bool.sum()))
@@ -466,7 +466,7 @@ def trans_probs(geo_path,rel_path,base_path,road_name,K,max_length,traj_train):
         count_array_col = np.zeros([num_nodes], dtype=int)
 
         train_file = traj_train
-        train = pd.read_csv(train_file, dtype={'id': int, 'hop': int, 'traj_id': int})
+        train = pd.read_csv(train_file, dtype={'id': int, 'hop': int, 'traj_uid': int})
 
         for _, row in tqdm(train.iterrows(), total=train.shape[0], desc='count traj prob'):
             plist = eval(row.path)[:max_length]
@@ -521,11 +521,11 @@ def cal_matmul(mat1, mat2):
     return res
 
 
-def select_geo_rel(selected_geo_ids, selected_path,new_data_name,road_path, geo_path,rel_path, use_mask, min_freq):
+def select_geo_rel(selected_geo_uids, selected_path,new_data_name,road_path, geo_path,rel_path, use_mask, min_freq):
     # 去掉没有被vocab选上的road所对应的geo和
 
     ensure_dir(selected_path)
-    selected_geo_ids = set(selected_geo_ids)
+    selected_geo_uids = set(selected_geo_uids)
 
 
     if os.path.exists(selected_path + '/{}.geo'.format(new_data_name)) and \
@@ -539,20 +539,20 @@ def select_geo_rel(selected_geo_ids, selected_path,new_data_name,road_path, geo_
     if 'id' not in geofile.keys():
         geofile['id'] = list(range(len(geofile)))
     for i in tqdm(range(geofile.shape[0]), desc='geo'):
-        if int(geofile.iloc[i]['id']) in selected_geo_ids:
+        if int(geofile.iloc[i]['id']) in selected_geo_uids:
            geo.append(geofile.iloc[i].values.tolist())
     geo = pd.DataFrame(geo, columns=geofile.columns)
     geo.to_csv(selected_path + '/{}.geo'.format(new_data_name), index=False)
 
     relfile = pd.read_csv(rel_path)
     relfile = relfile[relfile.rel_type=='road2road']
-    relfile.origin_id=relfile.origin_id-offset
-    relfile.destination_id=relfile.destination_id-offset
+    relfile.orig_geo_id=relfile.orig_geo_id-offset
+    relfile.dest_geo_id=relfile.dest_geo_id-offset
     rel = []
     for i in tqdm(range(relfile.shape[0]), desc='rel'):
-        oid = relfile.iloc[i]['origin_id']
-        did = relfile.iloc[i]['destination_id']
-        if oid not in selected_geo_ids or did not in selected_geo_ids:
+        oid = relfile.iloc[i]['orig_geo_id']
+        did = relfile.iloc[i]['dest_geo_id']
+        if oid not in selected_geo_uids or did not in selected_geo_uids:
             continue
         rel.append(relfile.iloc[i].values.tolist())
     rel = pd.DataFrame(rel, columns=relfile.columns)
@@ -577,16 +577,16 @@ def append_degree(selected_path, new_data_name, use_mask, min_freq):
     rel_file = selected_path + '/{}.grel'.format(new_data_name)
 
     geo = pd.read_csv(geo_file)
-    rel = pd.read_csv(rel_file)[['origin_id', 'destination_id']]
+    rel = pd.read_csv(rel_file)[['orig_geo_id', 'dest_geo_id']]
 
-    geo_ids = list(geo['id'])
+    geo_uids = list(geo['id'])
     geo_to_ind = {}
     ind_to_geo = {}
-    for index, geo_id in enumerate(geo_ids):
-        geo_to_ind[geo_id] = index
-        ind_to_geo[index] = geo_id
+    for index, geo_uid in enumerate(geo_uids):
+        geo_to_ind[geo_uid] = index
+        ind_to_geo[index] = geo_uid
 
-    adj_mx = np.zeros((len(geo_ids), len(geo_ids)), dtype=np.float32)
+    adj_mx = np.zeros((len(geo_uids), len(geo_uids)), dtype=np.float32)
     for row in rel.values:
         if row[0] not in geo_to_ind or row[1] not in geo_to_ind:
             print(row[0], row[1])
@@ -599,9 +599,9 @@ def append_degree(selected_path, new_data_name, use_mask, min_freq):
     indegree_list = []
 
     for i, row in tqdm(geo.iterrows(), total=geo.shape[0]):
-        geo_id = row.id
-        outdegree_i = outdegree[geo_to_ind[geo_id]]
-        indegree_i = indegree[geo_to_ind[geo_id]]
+        geo_uid = row.id
+        outdegree_i = outdegree[geo_to_ind[geo_uid]]
+        indegree_i = indegree[geo_to_ind[geo_uid]]
         outdegree_list.append(int(outdegree_i))
         indegree_list.append(int(indegree_i))
 

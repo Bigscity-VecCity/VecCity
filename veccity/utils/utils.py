@@ -71,19 +71,19 @@ def get_model(config, data_feature):
                            config['model'])(config, data_feature)
         except AttributeError:
             raise AttributeError('model is not found')
-    elif config['task'] == 'road_representation':
+    elif config['task'] == 'segment':
         try:
             return getattr(importlib.import_module('veccity.upstream.road_representation'),
                            config['model'])(config, data_feature)
         except AttributeError:
             raise AttributeError('model is not found')
-    elif config['task'] == 'region_representation':
+    elif config['task'] == 'parcel':
         try:
             return getattr(importlib.import_module('veccity.upstream.region_representation'),
                            config['model'])(config, data_feature)
         except AttributeError:
             raise AttributeError('model is not found')
-    elif config['task'] == 'poi_representation':
+    elif config['task'] == 'poi':
         try:
             return getattr(importlib.import_module('veccity.upstream.poi_representation'),
                            config['model'])(config, data_feature)

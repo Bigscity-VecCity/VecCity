@@ -40,8 +40,8 @@ class VisHelper:
                 self.grid_file.append(file)
 
         # reserved columns
-        self.geo_reserved_lst = ['type', 'coordinates']
-        self.dyna_reserved_lst = ['dyna_id', 'type', 'time', 'entity_id', 'traj_id', 'coordinates']
+        self.geo_reserved_lst = ['type', 'geo_location']
+        self.dyna_reserved_lst = ['dyna_id', 'type', 'time', 'user_id', 'traj_uid', 'geo_location']
         self.grid_reserved_lst = ['dyna_id', 'type', 'time', 'row_id', 'column_id']
 
     def visualize(self):
@@ -83,9 +83,9 @@ class VisHelper:
         for _, row in geo_file.iterrows():
 
             # get feature dictionary
-            geo_id = row['geo_id']
+            geo_uid = row['geo_uid']
             feature_dct = row[geo_feature_lst].to_dict()
-            dyna_i = dyna_file[dyna_file['entity_id'] == geo_id]
+            dyna_i = dyna_file[dyna_file['user_id'] == geo_uid]
             for f in dyna_feature_lst:
                 feature_dct[f] = float(dyna_i[f].mean())
 
@@ -95,7 +95,7 @@ class VisHelper:
             feature_i['properties'] = feature_dct
             feature_i['geometry'] = {}
             feature_i['geometry']['type'] = row['type']
-            feature_i['geometry']['coordinates'] = eval(row['coordinates'])
+            feature_i['geometry']['geo_location'] = eval(row['geo_location'])
             geojson_obj['features'].append(feature_i)
 
         ensure_dir(self.save_path)
@@ -129,7 +129,7 @@ class VisHelper:
             feature_i['properties'] = feature_dct
             feature_i['geometry'] = {}
             feature_i['geometry']['type'] = row['type']
-            feature_i['geometry']['coordinates'] = eval(row['coordinates'])
+            feature_i['geometry']['geo_location'] = eval(row['geo_location'])
             geojson_obj['features'].append(feature_i)
 
         ensure_dir(self.save_path)
@@ -152,8 +152,8 @@ class VisHelper:
             feature_i['properties'] = feature_dct
             feature_i['geometry'] = {}
             feature_i['geometry']['type'] = row['type']
-            feature_i['geometry']['coordinates'] = eval(row['coordinates'])
-            if len(feature_i['geometry']['coordinates']) == 0:
+            feature_i['geometry']['geo_location'] = eval(row['geo_location'])
+            if len(feature_i['geometry']['geo_location']) == 0:
                 return
             geojson_obj['features'].append(feature_i)
 
@@ -172,47 +172,47 @@ class VisHelper:
         if not GPS_traj:
             geo_file = pd.read_csv(self.geo_path, index_col=None)
 
-        a = dyna_file.groupby("entity_id")
-        for entity_id, entity_value in a:
-            if "traj_id" in dyna_file.columns:
-                trajectory[entity_id] = {}
-                entity_value = entity_value.groupby("traj_id")
-                for traj_id, traj_value in entity_value:
-                    feature_dct = {"usr_id": entity_id, "traj_id": traj_id}
+        a = dyna_file.groupby("user_id")
+        for user_id, entity_value in a:
+            if "traj_uid" in dyna_file.columns:
+                trajectory[user_id] = {}
+                entity_value = entity_value.groupby("traj_uid")
+                for traj_uid, traj_value in entity_value:
+                    feature_dct = {"usr_id": user_id, "traj_uid": traj_uid}
                     feature_i = dict()
                     feature_i['type'] = 'Feature'
                     feature_i['properties'] = feature_dct
                     feature_i['geometry'] = {}
                     feature_i['geometry']['type'] = "LineString"
-                    feature_i['geometry']['coordinates'] = []
+                    feature_i['geometry']['geo_location'] = []
                     if GPS_traj:
                         for _, row in traj_value.iterrows():
-                            feature_i['geometry']['coordinates'].append(eval(row['coordinates']))
+                            feature_i['geometry']['geo_location'].append(eval(row['geo_location']))
                     else:
                         for _, row in traj_value.iterrows():
-                            coor = eval(geo_file.loc[row['location']]['coordinates'])
+                            coor = eval(geo_file.loc[row['location']]['geo_location'])
                             if _ == 0:
-                                feature_i['geometry']['coordinates'].append(coor[0])
-                            feature_i['geometry']['coordinates'].append(coor[1])
+                                feature_i['geometry']['geo_location'].append(coor[0])
+                            feature_i['geometry']['geo_location'].append(coor[1])
                     geojson_obj['features'].append(feature_i)
 
             else:
-                feature_dct = {"usr_id": entity_id}
+                feature_dct = {"usr_id": user_id}
                 feature_i = dict()
                 feature_i['type'] = 'Feature'
                 feature_i['properties'] = feature_dct
                 feature_i['geometry'] = {}
                 feature_i['geometry']['type'] = "LineString"
-                feature_i['geometry']['coordinates'] = []
+                feature_i['geometry']['geo_location'] = []
                 if GPS_traj:
                     for _, row in entity_value.iterrows():
-                        feature_i['geometry']['coordinates'].append(eval(row['coordinates']))
+                        feature_i['geometry']['geo_location'].append(eval(row['geo_location']))
                 else:
                     for _, row in entity_value.iterrows():
-                        coor = eval(geo_file.loc[row['location']]['coordinates'])
+                        coor = eval(geo_file.loc[row['location']]['geo_location'])
                         if _ == 0:
-                            feature_i['geometry']['coordinates'].append(coor[0])
-                        feature_i['geometry']['coordinates'].append(coor[1])
+                            feature_i['geometry']['geo_location'].append(coor[0])
+                        feature_i['geometry']['geo_location'].append(coor[1])
                 geojson_obj['features'].append(feature_i)
 
         ensure_dir(self.save_path)

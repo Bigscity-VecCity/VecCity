@@ -34,7 +34,6 @@ class SRN2Vec(AbstractReprLearningModel):
         self.model = SRN2VecModule(node_num=self.num_nodes, device=self.device, emb_dim=self.output_dim, out_dim=2).to(self.device)
 
     def calculate_loss(self, batch):
-
         X = batch[0].to(self.device)
         y = batch[1].float().to(self.device)
         yh = self.model(X)
@@ -65,8 +64,7 @@ class SRN2Vec(AbstractReprLearningModel):
         self._logger.info('Embedding saved to {}'.format(self.npy_cache_file))
 
 
-    def encode(self, batch):
-        X = batch[0].to(self.device)
+    def encode(self, X):
         return self.model.embedding(X)
 
 

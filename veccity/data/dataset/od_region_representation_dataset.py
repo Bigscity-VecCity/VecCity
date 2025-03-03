@@ -102,18 +102,18 @@ class ODRegionRepresentationDataset(AbstractDataset):
 
     def _load_geo(self):
         """
-        加载.geo文件，格式[geo_id,type,geometry,crime_count,traffic_type,venue_category_name]
+        加载.geo文件，格式[geo_uid,type,geometry,crime_count,traffic_type,venue_category_name]
         """
         geofile = pd.read_csv(self.data_path + self.geo_file + '.geo')
         self.geofile = geofile
-        coordinates_list = geofile[geofile['traffic_type'] == 'region']['coordinates']
+        coordinates_list = geofile[geofile['traffic_type'] == 'region']['geo_location']
         l = coordinates_list if coordinates_list[0][0].isalpha() else [geojson2geometry(coordinate) for coordinate in coordinates_list]
         self.region_geometry = gpd.GeoSeries.from_wkt(l)
         self.centroid = self.region_geometry.centroid
-        self.geo_ids = list(geofile['geo_id'])
-        self.region_ids = list(geofile[geofile['traffic_type'] == 'region']['geo_id'])
+        self.geo_uids = list(geofile['geo_uid'])
+        self.region_ids = list(geofile[geofile['traffic_type'] == 'region']['geo_uid'])
         self.num_regions = len(self.region_ids)
-        self.poi_ids = list(geofile[geofile['traffic_type'] == 'poi']['geo_id'])
+        self.poi_ids = list(geofile[geofile['traffic_type'] == 'poi']['geo_uid'])
         self.num_pois = len(self.poi_ids)
         self.num_nodes = self.num_regions
         self._logger.info(
@@ -123,7 +123,7 @@ class ODRegionRepresentationDataset(AbstractDataset):
 
     def _load_rel(self):
         """
-        加载各个实体的联系，[rel_id,type,origin_id,destination_id,rel_type]
+        加载各个实体的联系，[rel_uid,type,orig_geo_id,dest_geo_id,rel_type]
         将region2poi和poi2region保存
         把region2region直接做成self.adj_mx，邻接的保存为质心距离，不邻接的保存为0
         """
@@ -141,17 +141,17 @@ class ODRegionRepresentationDataset(AbstractDataset):
                         tempa.append(i)
                         tempb.append(j)
 
-            data={"origin_id":tempa,"destination_id":tempb}
+            data={"orig_geo_id":tempa,"dest_geo_id":tempb}
             self.region2region=pd.DataFrame(data)
         self.region2region = self.region2region.reset_index(drop=True)
         self.adj_mx = np.zeros((self.num_nodes, self.num_nodes), dtype=np.float32)
         for i in range(len(self.region2region)):
-            origin_region_id = self.region2region.loc[i, "origin_id"]
-            destination_region_id = self.region2region.loc[i, "destination_id"]
+            origin_region_id = self.region2region.loc[i, "orig_geo_id"]
+            destination_region_id = self.region2region.loc[i, "dest_geo_id"]
             distance = self.centroid[origin_region_id].distance(self.centroid[destination_region_id])
             self.adj_mx[origin_region_id][destination_region_id] = distance
         """
-        加载各个实体的联系，格式['rel_id','type','origin_id','destination_id','rel_type']
+        加载各个实体的联系，格式['rel_uid','type','orig_geo_id','dest_geo_id','rel_type']
         后续可能会将两种实体之间的对应做成1-->n的映射
         """
         self.road2region = relfile[relfile['rel_type'] == 'road2region']

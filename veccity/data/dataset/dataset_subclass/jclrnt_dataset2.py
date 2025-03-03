@@ -26,8 +26,8 @@ class JCLRNTDataset(LineSeqDataset):
         with open(self.adj_json_path,'r',encoding='utf-8') as fp:
             road_adj_data = json.load(fp)
         for road in range(self.vocab.specials_num,self.num_nodes):
-            geo_id=self.ind_to_geo[road]
-            for neighbor in road_adj_data[str(geo_id)]:
+            geo_uid=self.ind_to_geo[road]
+            for neighbor in road_adj_data[str(geo_uid)]:
                 if neighbor not in self.geo_to_ind:
                     continue
                 n_id=self.geo_to_ind[neighbor]
@@ -59,8 +59,8 @@ class JCLRNTDataset(LineSeqDataset):
             od_data=pd.read_csv(od_path)
         
             for i in range(od_data.shape[0]):
-                origin_road=od_data['origin_id'][i]
-                destination_road=od_data['destination_id'][i]
+                origin_road=od_data['orig_geo_id'][i]
+                destination_road=od_data['dest_geo_id'][i]
                 if origin_road in self.geo_to_ind and destination_road in self.geo_to_ind:
                     o_id=self.geo_to_ind[origin_road]
                     d_id=self.geo_to_ind[destination_road]
@@ -156,8 +156,8 @@ class JCLRNTABLDataset(LineSeqDataset):
         with open(self.adj_json_path,'r',encoding='utf-8') as fp:
             road_adj_data = json.load(fp)
         for road in range(self.vocab.specials_num,self.num_nodes):
-            geo_id=self.ind_to_geo[road]
-            for neighbor in road_adj_data[str(geo_id)]:
+            geo_uid=self.ind_to_geo[road]
+            for neighbor in road_adj_data[str(geo_uid)]:
                 if neighbor not in self.geo_to_ind:
                     continue
                 n_id=self.geo_to_ind[neighbor]
@@ -189,8 +189,8 @@ class JCLRNTABLDataset(LineSeqDataset):
             od_data=pd.read_csv(od_path)
         
             for i in range(od_data.shape[0]):
-                origin_road=od_data['origin_id'][i]
-                destination_road=od_data['destination_id'][i]
+                origin_road=od_data['orig_geo_id'][i]
+                destination_road=od_data['dest_geo_id'][i]
                 if origin_road in self.geo_to_ind and destination_road in self.geo_to_ind:
                     o_id=self.geo_to_ind[origin_road]
                     d_id=self.geo_to_ind[destination_road]

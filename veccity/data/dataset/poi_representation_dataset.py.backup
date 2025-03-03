@@ -307,8 +307,8 @@ class POIRepresentationDataset(AbstractDataset):
     def _load_geo(self):
         geo_df = pd.read_csv(os.path.join(self.data_path, self.geo_file + '.geo'))
         geo_df = geo_df[geo_df['type'] == 'Point']
-        self.offset = geo_df['geo_id'].min()
-        poi_list = geo_df['coordinates'].tolist()
+        self.offset = geo_df['geo_uid'].min()
+        poi_list = geo_df['geo_location'].tolist()
         lng_list = []
         lat_list = []
         for s in poi_list:
@@ -317,7 +317,7 @@ class POIRepresentationDataset(AbstractDataset):
             lat_list.append(lat)
         lng_col = pd.Series(lng_list, name='lng')
         lat_col = pd.Series(lat_list, name='lat')
-        idx_col = pd.Series(list(range(len(geo_df))), name='geo_id')
+        idx_col = pd.Series(list(range(len(geo_df))), name='geo_uid')
         type_name = self.config.get('poi_type_name', None)
         if type_name is not None:
             category_list=list(geo_df[type_name].drop_duplicates())
@@ -334,19 +334,19 @@ class POIRepresentationDataset(AbstractDataset):
         dyna_df = pd.read_csv(os.path.join(self.data_path, self.dyna_file + '.dyna'))
         # TODO 区分 trajectory 和 check-in
         dyna_df = dyna_df[dyna_df['type'] == 'trajectory']
-        # dyna_df['location'] = dyna_df['geo_id'] - self.offset
-        dyna_df = dyna_df.merge(self.coor_df, left_on='location', right_on='geo_id', how='left')
+        # dyna_df['location'] = dyna_df['geo_uid'] - self.offset
+        dyna_df = dyna_df.merge(self.coor_df, left_on='location', right_on='geo_uid', how='left')
         dyna_df.rename(columns={'time': 'datetime'}, inplace=True)
         dyna_df.rename(columns={'location': 'loc_index'}, inplace=True)
-        dyna_df.rename(columns={'entity_id': 'user_index'}, inplace=True)
+        dyna_df.rename(columns={'user_id': 'user_index'}, inplace=True)
         self.df = dyna_df[['user_index', 'loc_index', 'datetime', 'lat', 'lng']]
         user_counts = self.df['user_index'].value_counts()
         self.df = self.df[self.df['user_index'].isin(user_counts.index[user_counts >= self.min_poi_cnt])]
         loc_counts = self.df['loc_index'].value_counts()
-        self.coor_df = self.coor_df[self.coor_df['geo_id'].isin(loc_counts.index[loc_counts >= self.min_frequency])]
+        self.coor_df = self.coor_df[self.coor_df['geo_uid'].isin(loc_counts.index[loc_counts >= self.min_frequency])]
         self.df = self.df[self.df['loc_index'].isin(loc_counts.index[loc_counts >= self.min_frequency])]
-        loc_index_map = self.gen_index_map(self.coor_df, 'geo_id')
-        self.coor_df['geo_id'] = self.coor_df['geo_id'].map(loc_index_map)
+        loc_index_map = self.gen_index_map(self.coor_df, 'geo_uid')
+        self.coor_df['geo_uid'] = self.coor_df['geo_uid'].map(loc_index_map)
         self.df['loc_index'] = self.df['loc_index'].map(loc_index_map)
         user_index_map = self.gen_index_map(self.df, 'user_index')
         self.df['user_index'] = self.df['user_index'].map(user_index_map)
