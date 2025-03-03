@@ -19,6 +19,7 @@ from veccity.upstream.road_representation.HRNR import get_sparse_adj
 from veccity.utils import ensure_dir
 from logging import getLogger
 from veccity.data.preprocess import preprocess_all, cache_dir
+from tqdm import tqdm, trange
 
 
 class HRNRDataset(AbstractDataset):
@@ -41,6 +42,7 @@ class HRNRDataset(AbstractDataset):
         ensure_dir(self.cache_file_folder)
         self.geo_file = self.data_path + self.config.get("geo_file", self.dataset) + ".geo"
         self.rel_file = self.data_path + self.config.get("rel_file", self.dataset) + ".grel"
+        
 
         # HRNR data
         
@@ -49,6 +51,8 @@ class HRNRDataset(AbstractDataset):
         self.adj = os.path.join(self.cache_file_folder, f"cache_{self.dataset}_adj.pickle")
         self.tsr = os.path.join(self.cache_file_folder, f"cache_{self.dataset}_struct_assign.pickle")
         self.trz = os.path.join(self.cache_file_folder, f"cache_{self.dataset}_fnc_assign.pickle")
+        self.trans_matrix_file = os.path.join(self.cache_file_folder, f"cache_{self.dataset}_trans_matrix.pickle")
+        self.trans_matrix = self.cal_trans_matrix()
 
         self.device = self.config.get('device', torch.device('cuda:1'))
 
@@ -65,6 +69,33 @@ class HRNRDataset(AbstractDataset):
         self._logger.info("lane_num: " + str(self.lane_num))
         self._logger.info("type_num: " + str(self.type_num))
         self._logger.info("length_num: " + str(self.length_num))
+    
+    def cal_trans_matrix(self):
+        if os.path.exists(self.trans_matrix_file):
+            return pickle.load(open(self.trans_matrix_file, "rb"))
+        data_cache_dir = os.path.join(cache_dir, self.dataset)
+        trajs = os.path.join(data_cache_dir, 'traj_road_train.csv')
+        trajs = pd.read_csv(trajs)
+        # 计算trajs中的转移矩阵
+        trans_matrix = np.zeros((self.num_nodes, self.num_nodes))
+        L = 5
+        trange = trange(len(trajs))
+        for traj in trajs:
+            trange.set_description("processing traj")
+            last_L =[]
+            for i in range(1, len(traj)):
+                for j in range(len(last_L)):
+                    trans_matrix[last_L[j]][traj[i]] += 1
+                if len(last_L) < L:
+                    last_L.append(traj[i])
+                else:
+                    last_L.pop(0)
+                    last_L.append(traj[i])
+            
+            trange.update(1)
+        pickle.dump(trans_matrix, open(self.trans_matrix_file, "wb"))
+        return trans_matrix            
+                
 
 
     def _transfer_files(self):
@@ -244,8 +275,9 @@ class HRNRDataset(AbstractDataset):
         optimizer2 = optim.Adam(RZ_GCN.parameters(), lr=5e-2)  # TODO: lr
         optimizer2.zero_grad()
         C = torch.tensor(Utils(self.num_nodes, self.adj_matrix).get_reachable_matrix(), dtype=torch.float)
+        C = C + torch.tensor(self.trans_matrix, dtype=torch.float).to(self.device) # 引入轨迹转移矩阵
         self._logger.info("calculating TRZ...")
-        for i in range(10):  # TODO: 迭代次数
+        for i in range(100):  # TODO: 迭代次数
             self._logger.info("epoch " + str(i))
             TRZ = RZ_GCN(NR.unsqueeze(0), AR.unsqueeze(0)).squeeze()
             TRZ = torch.softmax(TRZ, dim=0)

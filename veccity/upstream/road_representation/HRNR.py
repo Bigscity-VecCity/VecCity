@@ -48,7 +48,7 @@ class HRNR(AbstractReprLearningModel):
 
         self.graph_enc = GraphEncoderTL(hparams, self.struct_assign, self.fnc_assign, struct_adj, self.device)
 
-        self.linear = torch.nn.Linear(self.hidden_dims * 2, self.label_num)
+        self.linear = torch.nn.Linear(self.hidden_dims * 2, self.output_dim).to(self.device)
 
         self.node_emb, self.init_emb = None, None
 
@@ -61,10 +61,18 @@ class HRNR(AbstractReprLearningModel):
         self.node_emb = self.graph_enc(self.node_feature, self.type_feature, self.length_feature, self.lane_feature, self.adj)
         self.init_emb = self.graph_enc.init_feat
         output_state = torch.cat((self.node_emb[x], self.init_emb[x]), 1)
-        pred_tra = self.linear(output_state)
-        return pred_tra
+        output_state = self.linear(output_state)
+        return output_state
+    
+    def encode(self, x, cal_grad=True):
+        with torch.set_grad_enabled(cal_grad):
+            return self.forward(x)
         
     def run(self, train_dataloader, eval_dataloader):
+        if True:
+            # 预训练任务在dataset中已经完成，获得了assign matrix
+            pass 
+
         self._logger.info("Starting training...")
         hparams = dict_to_object(self.config.config)
         ce_criterion = torch.nn.CrossEntropyLoss()
