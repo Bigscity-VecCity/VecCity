@@ -78,7 +78,6 @@ class LineSeqDataset(AbstractDataset):
         self.road_adj=self.road_adj[select_geos,:]
         self.road_geo_df=self.road_geo_df.iloc[select_geos]
         self.num_nodes=self.vocab_size
-        self.choice=config.get('choice',0)
 
     def construct_road_adj(self):
         self.road_adj = np.zeros(shape=[self.road_num,self.road_num])

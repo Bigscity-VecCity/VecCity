@@ -26,7 +26,6 @@ class SpeedInferenceModel(AbstractModel):
         self.min_freq=config.get('min_freq',1)
         self.vocab_path = data_cache_dir+'/vocab_{}_True_{}.pkl'.format(self.dataset, self.min_freq)
         self.vocab = WordVocab.load_vocab(self.vocab_path)
-        self.choice=config.get('choice',0)
 
     def run(self, model, label):
         self._logger.info("-------- Speed Inference --------")
@@ -46,7 +45,6 @@ class SpeedInferenceModel(AbstractModel):
                 
         x=x[index_x]
         y=y[index_y]
-        choice=self.choice
         kf = KFold(n_splits=self.n_split)
         y_preds = []
         y_truths = []

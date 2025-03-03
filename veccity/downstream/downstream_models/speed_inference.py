@@ -36,7 +36,6 @@ class SpeedInferenceModel(AbstractModel):
             x_.append(x[int(i)])
         x = np.array(x_)
         y = np.array(label['speed']['speed'])
-        choice=self.choice
         kf = KFold(n_splits=self.n_split)
         y_preds = []
         y_truths = []
