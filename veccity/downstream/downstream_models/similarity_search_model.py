@@ -117,6 +117,13 @@ class STSModel(nn.Module):
         preds=similarity_matrix[index]
         labels=torch.ones(similarity_matrix.shape[0]).to(self.device)
         loss_res=self.criterion(preds,labels)
+        # # infoNCE
+        # # 只计算正样本对（对角线）
+        # logits = torch.matmul(out_view1, out_view2.T) / self.temperature
+        # # 构造标签：每个样本的正样本为同一位置，即对角线
+        # labels = torch.arange(logits.shape[0]).to(self.device)
+        # # 使用交叉熵损失，最大化正样本对的相似度，同时降低负样本对的相似度
+        # loss_res = F.cross_entropy(logits, labels)
         return loss_res
 
 class SimilaritySearchModel(AbstractModel):
