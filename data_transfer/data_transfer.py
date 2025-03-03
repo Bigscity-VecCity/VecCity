@@ -88,7 +88,7 @@ for _, rel in rel_df.iterrows():
         if rel["rel_type"] == "geospatial relationship":
             grel_data.append({
                 "rel_id": grel_id_counter,
-                "type": "geospatial relationship",
+                "type": "GR",
                 "orig_geo_id": rel["orig_geo_id"],
                 "dest_geo_id": rel["dest_geo_id"],
                 "rel_type": rel_type,
@@ -102,8 +102,9 @@ for _, rel in rel_df.iterrows():
         elif rel["rel_type"] == "social relationship":
             srel_data.append({
                 "rel_id": srel_id_counter,
-                # "start_time": rel["start_time"],  
-                # "end_time": rel["end_time"],  
+                "type": "SR",
+                "start_time": rel["start_time"],  
+                "end_time": rel["end_time"],  
                 "orig_geo_id": rel["orig_geo_id"],
                 "dest_geo_id": rel["dest_geo_id"],
                 "flow": rel["weight"] # Random weight value
