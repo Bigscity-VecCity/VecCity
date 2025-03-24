@@ -22,7 +22,7 @@
 Official repository of under review paper "*VecCity*: A Taxonomy-guided Library for Map Entity Representation Learning". Please star, watch, and fork our repo for the active updates!
 
 ## News
-- We will launch a new interface that supports standard input formats. More details see this [link](https://github.com/Bigscity-VecCity/VecCity/tree/main/data_transfer).
+- We launched a new interface that supports standard input formats. More details see this [link](https://github.com/Bigscity-VecCity/VecCity/tree/main/data_transfer).
 - We added HGI, ReDCL, and HAFusion to our library. 
 
 ## Coming Soon:
