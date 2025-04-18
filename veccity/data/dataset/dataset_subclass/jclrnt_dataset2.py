@@ -60,7 +60,7 @@ class JCLRNTDataset(LineSeqDataset):
         
             for i in range(od_data.shape[0]):
                 origin_road=od_data['orig_geo_id'][i]
-                destination_road=od_data['destination_id'][i]
+                destination_road=od_data['dest_geo_id'][i]
                 if origin_road in self.geo_to_ind and destination_road in self.geo_to_ind:
                     o_id=self.geo_to_ind[origin_road]
                     d_id=self.geo_to_ind[destination_road]
@@ -190,7 +190,7 @@ class JCLRNTABLDataset(LineSeqDataset):
         
             for i in range(od_data.shape[0]):
                 origin_road=od_data['orig_geo_id'][i]
-                destination_road=od_data['destination_id'][i]
+                destination_road=od_data['dest_geo_id'][i]
                 if origin_road in self.geo_to_ind and destination_road in self.geo_to_ind:
                     o_id=self.geo_to_ind[origin_road]
                     d_id=self.geo_to_ind[destination_road]

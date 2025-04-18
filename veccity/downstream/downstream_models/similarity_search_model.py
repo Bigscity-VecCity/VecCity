@@ -37,7 +37,7 @@ def build_graph(rel_file, geo_file):
 
     for i, row in tqdm(rel.iterrows(), total=rel.shape[0]):
         prev_id = row.orig_geo_id
-        curr_id = row.destination_id
+        curr_id = row.dest_geo_id
 
         # Use length as weight
         # weight = geo.iloc[prev_id].length
@@ -117,6 +117,13 @@ class STSModel(nn.Module):
         preds=similarity_matrix[index]
         labels=torch.ones(similarity_matrix.shape[0]).to(self.device)
         loss_res=self.criterion(preds,labels)
+        # # infoNCE
+        # # 只计算正样本对（对角线）
+        # logits = torch.matmul(out_view1, out_view2.T) / self.temperature
+        # # 构造标签：每个样本的正样本为同一位置，即对角线
+        # labels = torch.arange(logits.shape[0]).to(self.device)
+        # # 使用交叉熵损失，最大化正样本对的相似度，同时降低负样本对的相似度
+        # loss_res = F.cross_entropy(logits, labels)
         return loss_res
 
 class SimilaritySearchModel(AbstractModel):
@@ -175,7 +182,7 @@ class SimilaritySearchModel(AbstractModel):
             valid_loss=valid_loss/len(self.test_ori_dataloader)
 
             if best_loss==-1 or valid_loss<best_loss:
-                best_model=copy.deepcopy(self.model)
+                best_model=copy.copy(self.model)
                 best_loss=valid_loss
                 best_epoch=epoch
             self._logger.info("epoch {} complete! training loss {:.2f}, valid loss {:2f}, best_epoch {}, best_loss {:2f}".format(epoch, total_loss, valid_loss,best_epoch,best_loss))

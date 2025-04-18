@@ -80,7 +80,7 @@ class TravelTimeEstimationModel(AbstractModel):
         self.exp_id = config.get('exp_id', None)
         self.result_path = './veccity/cache/{}/evaluate_cache/regression_{}_{}.npy'. \
             format(self.exp_id, self.alpha, self.n_split)
-        self.choice=config.get('choice',0)
+
 
     def run(self, embedding_model, label, embed_model=None,**kwargs):
         self._logger.info("--- Time Estimation ---")

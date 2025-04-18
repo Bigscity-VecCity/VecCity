@@ -3,7 +3,7 @@ import random
 import torch
 from torch import optim
 from torch import nn
-from dataset import DataPipeline
+from workspace.modular.dataset import DataPipeline
 from w2v import SkipGram
 from TransEncoder import BERT
 

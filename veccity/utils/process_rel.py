@@ -88,7 +88,7 @@ def generate_rel():
     geo_df = pd.read_csv(os.path.join(dataset, f'{dataset}.geo'))
     region_cnt = len(geo_df[geo_df['traffic_type'] == 'region'])
     road_rel_df['orig_geo_id'] += region_cnt
-    road_rel_df['destination_id'] += region_cnt
+    road_rel_df['dest_geo_id'] += region_cnt
     road_rel_df.to_csv(os.path.join(dataset, f'{dataset}.grel'), index=False)
 
 def generate_crimes_count():
@@ -143,7 +143,7 @@ def generate_poi2region():
                     'rel_uid': rel_uid,
                     'type': 'geo',
                     'orig_geo_id': int(row['geo_uid']),
-                    'destination_id': j,
+                    'dest_geo_id': j,
                     'rel_type': 'poi2region'
                 })
                 rel_uid += 1
@@ -151,7 +151,7 @@ def generate_poi2region():
                     'rel_uid': rel_uid,
                     'type': 'geo',
                     'orig_geo_id': j,
-                    'destination_id': int(row['geo_uid']),
+                    'dest_geo_id': int(row['geo_uid']),
                     'rel_type': 'region2poi'
                 })
                 rel_uid += 1
@@ -259,7 +259,7 @@ def generate_road2region():
                     'rel_uid': rel_uid,
                     'type': 'geo',
                     'orig_geo_id': int(row['geo_uid']),
-                    'destination_id': j,
+                    'dest_geo_id': j,
                     'rel_type': 'road2region'
                 })
                 rel_uid += 1
@@ -267,7 +267,7 @@ def generate_road2region():
                     'rel_uid': rel_uid,
                     'type': 'geo',
                     'orig_geo_id': j,
-                    'destination_id': int(row['geo_uid']),
+                    'dest_geo_id': int(row['geo_uid']),
                     'rel_type': 'region2road'
                 })
                 rel_uid += 1
@@ -279,7 +279,7 @@ def generate_road2region():
                 'rel_uid': rel_uid2,
                 'type': 'geo',
                 'orig_geo_id': int(row['geo_uid']),
-                'destination_id': min_id,
+                'dest_geo_id': min_id,
                 'rel_type': 'road2region'
             })
             rel_uid2 += 1
@@ -287,7 +287,7 @@ def generate_road2region():
                 'rel_uid': rel_uid2,
                 'type': 'geo',
                 'orig_geo_id': min_id,
-                'destination_id': int(row['geo_uid']),
+                'dest_geo_id': int(row['geo_uid']),
                 'rel_type': 'region2road'
             })
             rel_uid2 += 1
@@ -483,7 +483,7 @@ def generate_od_from_points():
     df = pd.read_csv(f'{dataset}/{dataset}_traj.csv')
     # df = df[:100]
     gap = 15
-    od_dict = {'start_time': [], 'end_time': [], 'orig_geo_id': [], 'destination_id': []}
+    od_dict = {'start_time': [], 'end_time': [], 'orig_geo_id': [], 'dest_geo_id': []}
     invalid = 0
     for i, row in tqdm(df.iterrows(), total=len(df)):
         try:
@@ -493,24 +493,24 @@ def generate_od_from_points():
             continue
         origin = Point(linestring.coords[0])
         destination = Point(linestring.coords[-1])
-        orig_geo_id, destination_id = None, None
+        orig_geo_id, dest_geo_id = None, None
         start_time = timestamp2str(row['TIMESTAMP'])
         end_time = timestamp2str(row['TIMESTAMP'] + (len(linestring.coords) - 1) * gap)
         for j, region in enumerate(g):
             if region.contains(origin):
                 orig_geo_id = j
             if region.contains(destination):
-                destination_id = j
-            if orig_geo_id is not None and destination_id is not None:
+                dest_geo_id = j
+            if orig_geo_id is not None and dest_geo_id is not None:
                 break
-        if orig_geo_id is None or destination_id is None or orig_geo_id == destination_id:
+        if orig_geo_id is None or dest_geo_id is None or orig_geo_id == dest_geo_id:
             invalid += 1
             continue
-        # assert orig_geo_id is not None and destination_id is not None
+        # assert orig_geo_id is not None and dest_geo_id is not None
         od_dict['start_time'].append(start_time)
         od_dict['end_time'].append(end_time)
         od_dict['orig_geo_id'].append(orig_geo_id)
-        od_dict['destination_id'].append(destination_id)
+        od_dict['dest_geo_id'].append(dest_geo_id)
     print(f'invalid: {invalid}, total: {len(df)}')
     df = pd.DataFrame(od_dict)
     df['dyna_id'] = list(range(len(df)))
@@ -560,8 +560,8 @@ def generate_od_from_road_traj():
     rel_df = rel_df[rel_df['rel_type'] == 'road2region']
     road2region = [0 for _ in range(int(rel_df['orig_geo_id']) + 100)]
     for i, row in rel_df.iterrows():
-        road2region[int(row['orig_geo_id'])] = int(row['destination_id'])
-    start_time, end_time, orig_geo_id, destination_id = [], [], [], []
+        road2region[int(row['orig_geo_id'])] = int(row['dest_geo_id'])
+    start_time, end_time, orig_geo_id, dest_geo_id = [], [], [], []
     cnt = 0
     for i in range(id[-1] + 1):
         o = road2region[path[i][0]]
@@ -572,12 +572,12 @@ def generate_od_from_road_traj():
         start_time.append(timestamp2str(tlist[i][0]))
         end_time.append(timestamp2str(tlist[i][-1]))
         orig_geo_id.append(o)
-        destination_id.append(d)
+        dest_geo_id.append(d)
     print(f'total {id[-1] + 1}, invalid {cnt}')
     df = pd.concat(
         [
             pd.Series(orig_geo_id, name='orig_geo_id'),
-            pd.Series(destination_id, name='destination_id'),
+            pd.Series(dest_geo_id, name='dest_geo_id'),
             pd.Series(start_time, name='start_time'),
             pd.Series(end_time, name='end_time')
         ], axis=1)
@@ -677,5 +677,5 @@ def add_rel_road_id():
         if row['rel_type'] != 'road2road':
             break
         rel_df.loc[i, 'orig_geo_id'] += num_regions
-        rel_df.loc[i, 'destination_id'] += num_regions
+        rel_df.loc[i, 'dest_geo_id'] += num_regions
     rel_df.to_csv(os.path.join(dataset, f'{dataset}.grel'), index=False)

@@ -139,7 +139,7 @@ class BaseDataset(AbstractDataset):
         return geofile
 
     def _load_rel(self):
-        relfile = pd.read_csv(self.selected_path + self.rel_file + '.grel')[['orig_geo_id', 'destination_id']]# 数据od
+        relfile = pd.read_csv(self.selected_path + self.rel_file + '.grel')[['orig_geo_id', 'dest_geo_id']]# 数据od
         self.adj_mx = np.zeros((len(self.geo_uids), len(self.geo_uids)), dtype=np.float32)
         for row in relfile.values:
             if row[0] not in self.geo_to_ind or row[1] not in self.geo_to_ind:
@@ -426,7 +426,7 @@ def trans_probs(geo_path,rel_path,base_path,road_name,K,max_length,traj_train):
     if os.path.exists(path):
         geoid2neighbors = json.load(open(path, 'r'))
     else:
-        relfile = pd.read_csv(rel_path)[['orig_geo_id', 'destination_id']]
+        relfile = pd.read_csv(rel_path)[['orig_geo_id', 'dest_geo_id']]
         print('Rel', relfile.shape)
         adj_mx = np.zeros((len(geo_uids), len(geo_uids)), dtype=np.float32)
         for row in relfile.values:
@@ -547,11 +547,11 @@ def select_geo_rel(selected_geo_uids, selected_path,new_data_name,road_path, geo
     relfile = pd.read_csv(rel_path)
     relfile = relfile[relfile.rel_type=='road2road']
     relfile.orig_geo_id=relfile.orig_geo_id-offset
-    relfile.destination_id=relfile.destination_id-offset
+    relfile.dest_geo_id=relfile.dest_geo_id-offset
     rel = []
     for i in tqdm(range(relfile.shape[0]), desc='rel'):
         oid = relfile.iloc[i]['orig_geo_id']
-        did = relfile.iloc[i]['destination_id']
+        did = relfile.iloc[i]['dest_geo_id']
         if oid not in selected_geo_uids or did not in selected_geo_uids:
             continue
         rel.append(relfile.iloc[i].values.tolist())
@@ -577,7 +577,7 @@ def append_degree(selected_path, new_data_name, use_mask, min_freq):
     rel_file = selected_path + '/{}.grel'.format(new_data_name)
 
     geo = pd.read_csv(geo_file)
-    rel = pd.read_csv(rel_file)[['orig_geo_id', 'destination_id']]
+    rel = pd.read_csv(rel_file)[['orig_geo_id', 'dest_geo_id']]
 
     geo_uids = list(geo['id'])
     geo_to_ind = {}

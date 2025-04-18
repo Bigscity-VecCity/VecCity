@@ -55,7 +55,7 @@ class MGFNDataset(AbstractDataset):
         flow_graph = np.zeros([self.time_slice, self.num_nodes, self.num_nodes])
         for _, row in od_file.iterrows():
             origin_region = int(row['orig_geo_id'])
-            destination_region = int(row['destination_id'])
+            destination_region = int(row['dest_geo_id'])
             time = datetime.fromtimestamp(int(row['end_time']))
             flow_graph[time.hour // time_each_slice][origin_region][destination_region] += 1
         np.save(self.flow_graph_path, flow_graph)

@@ -105,7 +105,7 @@ class HRNRDataset(AbstractDataset):
             [geo_uid, type, coordinates, lane, type, length, bridge]
             from
             [geo_uid, type, coordinates, highway, length, lanes, tunnel, bridge, maxspeed, width, alley, roundabout]
-        .rel [rel_uid, type, orig_geo_id, destination_id]
+        .rel [rel_uid, type, orig_geo_id, dest_geo_id]
         """
 
         self._logger.info("generating files...")
@@ -131,7 +131,7 @@ class HRNRDataset(AbstractDataset):
         rel = rel[rel["rel_type"]=='road2road']
         offset = geo.geo_uid.min()
         rel.orig_geo_id = rel.orig_geo_id - offset
-        rel.destination_id = rel.destination_id - offset
+        rel.dest_geo_id = rel.dest_geo_id - offset
         self.num_nodes = geo.shape[0]
         geo_uids = list(geo["geo_uid"].apply(int)-offset) 
         self._logger.info("Geo_N is " + str(self.num_nodes))
@@ -176,7 +176,7 @@ class HRNRDataset(AbstractDataset):
         self.adj_matrix = [[0 for i in range(0, self.num_nodes)] for j in range(0, self.num_nodes)]
         for row in rel.itertuples():
             origin = getattr(row, "orig_geo_id")
-            destination = getattr(row, "destination_id")
+            destination = getattr(row, "dest_geo_id")
             self.adj_matrix[origin][destination] = 1
         pickle.dump(self.adj_matrix, open(self.adj, "wb"))
 

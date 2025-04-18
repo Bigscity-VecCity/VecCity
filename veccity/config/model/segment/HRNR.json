@@ -25,7 +25,7 @@
     "is_bigru": "True",
     "state_num": 2,
     "vocab_size": 16000,
-    "batch_size": 100,
+    "batch_size": 64,
     "device": "cpu",
     "use_cn_gnn": "False",
     "gnn_layers": 1,
@@ -58,6 +58,6 @@
     "label_epoch": 20,
 
     "baseline_gat_layer": 1,
-    "evaluate_tasks":["tte","tsi", "sts"],
-    "evaluate_models":["TravelTimeEstimationModel","SpeedInferenceModel","SimilaritySearchModel"]
+    "evaluate_tasks":[ "sts","tte","tsi"],
+    "evaluate_models":["SimilaritySearchModel","TravelTimeEstimationModel","SpeedInferenceModel"]
 }

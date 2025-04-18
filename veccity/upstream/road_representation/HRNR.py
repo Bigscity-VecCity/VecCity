@@ -67,9 +67,6 @@ class HRNR(AbstractReprLearningModel):
         return output_state
         
     def run(self, train_dataloader, eval_dataloader):
-        if True:
-            return
-
         self._logger.info("Starting training...")
         hparams = dict_to_object(self.config.config)
         ce_criterion = torch.nn.CrossEntropyLoss()
@@ -85,7 +82,7 @@ class HRNR(AbstractReprLearningModel):
                 model_optimizer.zero_grad()
                 train_set = train_set.clone().detach()
                 train_label = train_label.clone().detach()
-                pred = self(train_set)
+                pred = self.encode(train_set)
                 loss = ce_criterion(pred, train_label)
                 loss.backward(retain_graph=True)
                 torch.nn.utils.clip_grad_norm_(self.parameters(), hparams.lp_clip)
@@ -130,7 +127,7 @@ class HRNR(AbstractReprLearningModel):
         right = 0
         sum_num = 0
         test_set = test_set.clone().detach()
-        pred = self(test_set)
+        pred = self.encode(test_set)
         pred_prob = F.softmax(pred, -1)
         pred_scores = pred_prob[:, 1]
         auc = roc_auc_score(np.array(test_label), np.array(pred_scores.tolist()))

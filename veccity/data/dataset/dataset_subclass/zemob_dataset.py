@@ -90,7 +90,7 @@ class ZEMobDataset(AbstractDataset):
             origin_mobility_event = (origin_region, origin_hour, origin_date_type, 'o')
 
             # 得到目的zone和目的zone对应的mobility_event
-            destination_region = int(row['destination_id'])
+            destination_region = int(row['dest_geo_id'])
             destination_date = datetime.fromtimestamp(row['end_time'])
             destination_hour = destination_date.hour
             destination_date_type = 1 if destination_date.weekday() in range(5) else 0

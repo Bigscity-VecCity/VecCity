@@ -36,7 +36,7 @@
             "executor": "LINEExecutor",
             "evaluator": "HHGCLEvaluator"
         },
-        "SRN2Vec": {
+        "RN2Vec": {
             "dataset_class": "SRN2VecDataset",
             "executor": "TwoStepExecutor",
             "evaluator": "HHGCLEvaluator"

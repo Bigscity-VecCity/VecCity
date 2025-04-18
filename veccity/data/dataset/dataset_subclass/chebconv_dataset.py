@@ -63,7 +63,7 @@ class ChebConvDataset(AbstractDataset):
 
     def _load_rel(self):
         """
-        加载.rel文件，格式[rel_uid, type, orig_geo_id, destination_id, properties(若干列)],
+        加载.rel文件，格式[rel_uid, type, orig_geo_id, dest_geo_id, properties(若干列)],
         生成N*N的矩阵，默认.rel存在的边表示为1，不存在的边表示为0
 
         Returns:
@@ -78,9 +78,9 @@ class ChebConvDataset(AbstractDataset):
         adj_set = set()
         cnt = 0
         for i in range(map_info.shape[0]):
-            if map_info['orig_geo_id'][i] in self.geo_to_ind and map_info['destination_id'][i] in self.geo_to_ind:
+            if map_info['orig_geo_id'][i] in self.geo_to_ind and map_info['dest_geo_id'][i] in self.geo_to_ind:
                 f_id = self.geo_to_ind[map_info['orig_geo_id'][i]] - self.num_regions
-                t_id = self.geo_to_ind[map_info['destination_id'][i]] - self.num_regions
+                t_id = self.geo_to_ind[map_info['dest_geo_id'][i]] - self.num_regions
                 if (f_id, t_id) not in adj_set:
                     adj_set.add((f_id, t_id))
                     adj_row.append(f_id)

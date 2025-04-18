@@ -52,14 +52,14 @@ class ReMVCDataset(TrafficRepresentationDataset):
                 poi_dict[row['geo_uid']] = poi_map[row[self.config.get('poi_type_name')]]
             for _, row in self.region2poi.iterrows():
                 region_id = row['orig_geo_id']
-                poi_id = row['destination_id']
+                poi_id = row['dest_geo_id']
                 region_dict[region_id]['poi'].append(poi_dict[poi_id])
 
             # matrix
             od_df = pd.read_csv(os.path.join(cache_dir, self.dataset, 'od_region_train.csv'))
             for _, row in od_df.iterrows():
                 origin = int(row['orig_geo_id'])
-                destination = int(row['destination_id'])
+                destination = int(row['dest_geo_id'])
                 o_time_slice = (int(row['start_time']) % 86400) // (86400 // time_slices_num)
                 d_time_slice = (int(row['end_time']) % 86400) // (86400 // time_slices_num)
                 region_dict[origin]['pickup_matrix'][o_time_slice][destination] += 1

@@ -94,21 +94,10 @@ class POIRepresentationEvaluator(AbstractEvaluator):
         labels=category.category.to_numpy()
         
         num_class = labels.max()+1
-        choice=self.choice
+        
         skf=StratifiedKFold(n_splits=5,shuffle=True,random_state=seed)
         score_log = []
         for i,(train_ind,valid_ind) in enumerate(skf.split(inputs,labels)):
-            if choice <100:
-                cur_lens=len(train_ind)
-                k=int(cur_lens*choice/100)
-                index_range=list(range(cur_lens))
-                select_index=random.choices(index_range,k=k)
-                train_ind=train_ind[select_index]
-                if i==0:
-                    print(f"do choice with {choice}%")
-                    print(f"befor is {cur_lens}")
-                    after=len(train_ind)
-                    print(f"after is {after}")
             clf_model = FCClassifier(copy.deepcopy(embed_layer),embed_size,num_class,hidden_size=128).to(device)
             optimizer = torch.optim.Adam(clf_model.parameters(), lr=1e-4)
             loss_func = nn.CrossEntropyLoss()
