@@ -23,7 +23,7 @@ Official repository of under review paper "*VecCity*: A Taxonomy-guided Library 
 
 ## News
 - We launched a new interface that supports standard input formats. More details see this [link](https://github.com/Bigscity-VecCity/VecCity/tree/main/data_transfer).
-- We added HGI, ReDCL, and HAFusion to our library. 
+- We added HGI, ReDCL, HAFusion, and TrajRNE to our library. 
 
 ## Coming Soon:
 1. We are adding JGRM, R2Vec, CatEM, and CAPE to further enhance our library.
