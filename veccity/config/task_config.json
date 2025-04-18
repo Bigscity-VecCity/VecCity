@@ -1,7 +1,7 @@
 {
     "segment": {
         "allowed_model": [
-            "ChebConv", "LINE", "GAT", "Node2Vec", "DeepWalk", "GeomGCN","JCLRNT","SRN2Vec","HyperRoad","SARN","Toast","START","HRNR"
+            "ChebConv", "LINE", "GAT", "Node2Vec", "DeepWalk", "GeomGCN","JCLRNT","SRN2Vec","HyperRoad","SARN","Toast","START","HRNR","TrajRNE"
         ],
         "allowed_dataset": [
             "xa","bj","cd"
@@ -68,6 +68,11 @@
         },
         "HRNR":{
             "dataset_class": "HRNRDataset",
+            "executor": "TwoStepExecutor",
+            "evaluator": "HHGCLEvaluator"
+        },
+        "TrajRNE":{
+            "dataset_class": "TrajRNEDataset",
             "executor": "TwoStepExecutor",
             "evaluator": "HHGCLEvaluator"
         }
