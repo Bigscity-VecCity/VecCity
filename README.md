@@ -42,31 +42,31 @@ MapRL models encodes various entities in a unified configuration, which facilita
 
 | Model    | Target Entity | Category    | Run Args  | Ref                        |
 |----------|---------------|-------------|-----------|----------------------------|
-| SkipG  | POI            | Token-based | SkipGram  | Mikolov et al., arXiv 2013 |
-| Tale   | POI            | Token-based | Tale      | Wan et al., TKDE 2022      |
-| Teaser | POI            | Token-based | Teaser    | Zhao et al., WWW 2017      |
-| Hier   | POI            | Seq-based   | Hier      | Shimizu et al., arXiv 2020 |
-| P2Vec  | POI            | Token-based | POI2Vec   | Feng et al., AAAI 2022     |
-| CACSR  | POI            | Seq-based   | CACSR     | Gong et al., AAAI 2023     |
-| CTLE   | POI            | Seq-based   | CTLE      | Lin et al., AAAI 2022      |
-| RN2Vec | Segment        | Token-based | RN2Vec    | Wang et al., TIST 2021     |
-| HRNR   | Segment        | Graph-based | HRNR      | Wu et al., KDD 2020        |
-| SARN   | Segment        | Graph-based | SARN      | Chang et al., —            |
-| Toast  | Segment        | Seq-based   | Toast     | Chen et al., CIKM 2021     |
-| HRoad  | Segment        | Graph-based | HyperRoad | —                          |
-| START  | Segment        | Seq-based   | START     | Jiang et al., 2022         |
-| JCLRNT | Segment        | Seq-based   | JCLRNT    | Mao et al., CIKM 2022      |
-| TrajRNE  | Segment        | Graph-based   | TrajRNE     | Jiang et al., 2022         |
-| ZEMob  | Parcel         | Token-based | ZEMob     | Yao et al., IJCAI 2018     |
-| GMEL  | Parcel         | Graph-based | GMEL      | Liu et al., AAAI 2020      |
-| MGFN   | Parcel         | Graph-based | MGFN      | Wu et al., —               |
-| HDGE   | Parcel         | Token-based | HDGE      | Wang et al., CIKM 2017     |
-| MVURE  | Parcel         | Graph-based | MVURE     | Zhang et al., IJCAI 2020   |
-| ReMVC  | Parcel         | Token-based | ReMVC     | Zhang et al., 2022         |
-| HGI   | Parcel         | Graph-based | HGI      | Zhou et al., —             |
-| ReDCL   | Parcel         | Token-based | ReDCL      | Zhou et al., —             |
-| HREP   | Parcel         | Graph-based | HREP      | Zhou et al., —             |
-| HAFus| Parcel         | Graph-based | HAFusion      | Zhou et al., —             |
+| SkipG  | POI            | Token-based | --task POI --model SkipGram  | [Mikolov et al., arXiv 2013](https://arxiv.org/abs/1301.3781) |
+| Tale   | POI            | Token-based |--task POI --model Tale      | [Wan et al., TKDE 2022](https://ieeexplore.ieee.org/document/9351627)      |
+| Teaser | POI            | Token-based |--task POI --model Teaser    | [Zhao et al., WWW 2017](https://dl.acm.org/doi/10.1145/3041021.3054138)      |
+| Hier   | POI            | Seq-based   |--task POI --model Hier      | [Shimizu et al., SIGSPATIAL 2020](https://dl.acm.org/doi/10.1145/3397536.3422229) |
+| P2Vec  | POI            | Token-based |--task POI --model POI2Vec   | [Feng et al., AAAI 2022](https://ojs.aaai.org/index.php/AAAI/article/view/10500)     |
+| CACSR  | POI            | Seq-based   |--task POI --model CACSR     | [Gong et al., AAAI 2023](https://dl.acm.org/doi/10.1609/aaai.v37i4.25546)     |
+| CTLE   | POI            | Seq-based   |--task POI --model CTLE      | [Lin et al., AAAI 2022](https://ojs.aaai.org/index.php/AAAI/article/view/16548)      |
+| RN2Vec | Segment        | Token-based |--task segment --model RN2Vec    | [Wang et al., TIST 2021](https://dl.acm.org/doi/10.1145/3424346)     |
+| HRNR   | Segment        | Graph-based |--task segment --model HRNR      | [Wu et al., KDD 2020](https://dl.acm.org/doi/10.1145/3394486.3403043)        |
+| SARN   | Segment        | Graph-based |--task segment --model SARN      | [Chang et al., EDBT 2023](https://openproceedings.org/2023/conf/edbt/paper-193.pdf)            |
+| Toast  | Segment        | Seq-based   |--task segment --model Toast     | [Chen et al., CIKM 2021](https://dl.acm.org/doi/abs/10.1145/3459637.3482293)     |
+| HRoad  | Segment        | Graph-based |--task segment --model HyperRoad | [Zhang et al.,TKDD 2023](https://dl.acm.org/doi/full/10.1145/3592859)                         |
+| START  | Segment        | Seq-based   |--task segment --model START     | [Jiang et al.,ICDE 2023](https://ieeexplore.ieee.org/document/10184736)         |
+| JCLRNT | Segment        | Seq-based   |--task segment --model JCLRNT    | [Mao et al., CIKM 2022](https://dl.acm.org/doi/10.1145/3511808.3557370)      |
+| TrajRNE  | Segment        | Graph-based   |--task segment --model TrajRNE     | [Jiang et al., PAKDD 2023](https://link.springer.com/chapter/10.1007/978-3-031-33383-5_5)         |
+| ZEMob  | Parcel         | Token-based |--task parcel --model ZEMob     | [Yao et al., IJCAI 2018](https://www.ijcai.org/proceedings/2018/545)     |
+| GMEL  | Parcel         | Graph-based |--task parcel --model GMEL      | [Liu et al., AAAI 2020](https://ojs.aaai.org/index.php/AAAI/article/view/5425)      |
+| MGFN   | Parcel         | Graph-based |--task parcel --model MGFN      | [Wu et al., AAAI 2023](https://ojs.aaai.org/index.php/AAAI/article/view/25112)               |
+| HDGE   | Parcel         | Token-based |--task parcel --model HDGE      |[Wang et al., CIKM 2017](https://dl.acm.org/doi/10.1145/3132847.3133006)     |
+| MVURE  | Parcel         | Graph-based |--task parcel --model MVURE     | [Zhang et al., IJCAI 2020](https://www.ijcai.org/proceedings/2020/0611.pdf)   |
+| ReMVC  | Parcel         | Token-based |--task parcel --model ReMVC     | [Zhang et al.,TKDE 2022](https://dl.acm.org/doi/abs/10.1109/TKDE.2022.3220874)         |
+| HGI   | Parcel         | Graph-based |--task parcel --model HGI      | [Huang et al., ISPRS 2023](https://www.sciencedirect.com/science/article/abs/pii/S0924271622003148)             |
+| ReDCL   | Parcel         | Token-based |--task parcel --model ReDCL      | [Li et al., KDD 2023](https://dl.acm.org/doi/10.1145/3580305.3599538)             |
+| HREP   | Parcel         | Graph-based |--task parcel --model HREP      | [Zhou et al., AAAI 2023](https://ojs.aaai.org/index.php/AAAI/article/view/25625)             |
+| HAFus| Parcel         | Graph-based |--task parcel --model HAFusion      | [Zhou et al., ICDE 2024](https://ieeexplore.ieee.org/document/10597688)             |
 
 
 
