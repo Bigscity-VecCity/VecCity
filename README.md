@@ -42,13 +42,13 @@ MapRL models encodes various entities in a unified configuration, which facilita
 
 | Model    | Target Entity | Category    | Run Args  | Ref                        |
 |----------|---------------|-------------|-----------|----------------------------|
-| SkipG  | POI            | Token-based | --task POI --model SkipGram  | [Mikolov et al., arXiv 2013](https://arxiv.org/abs/1301.3781) |
-| Tale   | POI            | Token-based |--task POI --model Tale      | [Wan et al., TKDE 2022](https://ieeexplore.ieee.org/document/9351627)      |
-| Teaser | POI            | Token-based |--task POI --model Teaser    | [Zhao et al., WWW 2017](https://dl.acm.org/doi/10.1145/3041021.3054138)      |
-| Hier   | POI            | Seq-based   |--task POI --model Hier      | [Shimizu et al., SIGSPATIAL 2020](https://dl.acm.org/doi/10.1145/3397536.3422229) |
-| P2Vec  | POI            | Token-based |--task POI --model POI2Vec   | [Feng et al., AAAI 2022](https://ojs.aaai.org/index.php/AAAI/article/view/10500)     |
-| CACSR  | POI            | Seq-based   |--task POI --model CACSR     | [Gong et al., AAAI 2023](https://dl.acm.org/doi/10.1609/aaai.v37i4.25546)     |
-| CTLE   | POI            | Seq-based   |--task POI --model CTLE      | [Lin et al., AAAI 2022](https://ojs.aaai.org/index.php/AAAI/article/view/16548)      |
+| SkipG  | POI            | Token-based | --task poi --model SkipGram  | [Mikolov et al., arXiv 2013](https://arxiv.org/abs/1301.3781) |
+| Tale   | POI            | Token-based |--task poi --model Tale      | [Wan et al., TKDE 2022](https://ieeexplore.ieee.org/document/9351627)      |
+| Teaser | POI            | Token-based |--task poi --model Teaser    | [Zhao et al., WWW 2017](https://dl.acm.org/doi/10.1145/3041021.3054138)      |
+| Hier   | POI            | Seq-based   |--task poi --model Hier      | [Shimizu et al., SIGSPATIAL 2020](https://dl.acm.org/doi/10.1145/3397536.3422229) |
+| P2Vec  | POI            | Token-based |--task poi --model POI2Vec   | [Feng et al., AAAI 2022](https://ojs.aaai.org/index.php/AAAI/article/view/10500)     |
+| CACSR  | POI            | Seq-based   |--task poi --model CACSR     | [Gong et al., AAAI 2023](https://dl.acm.org/doi/10.1609/aaai.v37i4.25546)     |
+| CTLE   | POI            | Seq-based   |--task poi --model CTLE      | [Lin et al., AAAI 2022](https://ojs.aaai.org/index.php/AAAI/article/view/16548)      |
 | RN2Vec | Segment        | Token-based |--task segment --model RN2Vec    | [Wang et al., TIST 2021](https://dl.acm.org/doi/10.1145/3424346)     |
 | HRNR   | Segment        | Graph-based |--task segment --model HRNR      | [Wu et al., KDD 2020](https://dl.acm.org/doi/10.1145/3394486.3403043)        |
 | SARN   | Segment        | Graph-based |--task segment --model SARN      | [Chang et al., EDBT 2023](https://openproceedings.org/2023/conf/edbt/paper-193.pdf)            |
