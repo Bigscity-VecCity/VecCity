@@ -37,6 +37,57 @@ Official repository of under review paper "*VecCity*: A Taxonomy-guided Library 
 *VecCity* is an open-sourced and standardized benchmark compatible with various datasets and baseline models. The above figure illustrates the arcitecture of VecCity. 
 For a given dataset, we first construct atomic files from multi-sourced city data by extracting and mapping entities (e.g., POIs, road segments, land parcels, etc.) and auxiliary data into corresponding atomic files. 
 MapRL models encodes various entities in a unified configuration, which facilitates joint processing for various downstream tasks.
+
+### Supported Models
+
+| Model    | Target Entity | Category    | Run Args  | Ref                        |
+|----------|---------------|-------------|-----------|----------------------------|
+| SkipG  | POI            | Token-based | SkipGram  | Mikolov et al., arXiv 2013 |
+| Tale   | POI            | Token-based | Tale      | Wan et al., TKDE 2022      |
+| Teaser | POI            | Token-based | Teaser    | Zhao et al., WWW 2017      |
+| Hier   | POI            | Seq-based   | Hier      | Shimizu et al., arXiv 2020 |
+| P2Vec  | POI            | Token-based | POI2Vec   | Feng et al., AAAI 2022     |
+| CACSR  | POI            | Seq-based   | CACSR     | Gong et al., AAAI 2023     |
+| CTLE   | POI            | Seq-based   | CTLE      | Lin et al., AAAI 2022      |
+| RN2Vec | Segment        | Token-based | RN2Vec    | Wang et al., TIST 2021     |
+| HRNR   | Segment        | Graph-based | HRNR      | Wu et al., KDD 2020        |
+| SARN   | Segment        | Graph-based | SARN      | Chang et al., —            |
+| Toast  | Segment        | Seq-based   | Toast     | Chen et al., CIKM 2021     |
+| HRoad  | Segment        | Graph-based | HyperRoad | —                          |
+| START  | Segment        | Seq-based   | START     | Jiang et al., 2022         |
+| JCLRNT | Segment        | Seq-based   | JCLRNT    | Mao et al., CIKM 2022      |
+| TrajRNE  | Segment        | Graph-based   | TrajRNE     | Jiang et al., 2022         |
+| ZEMob  | Parcel         | Token-based | ZEMob     | Yao et al., IJCAI 2018     |
+| GMEL  | Parcel         | Graph-based | GMEL      | Liu et al., AAAI 2020      |
+| MGFN   | Parcel         | Graph-based | MGFN      | Wu et al., —               |
+| HDGE   | Parcel         | Token-based | HDGE      | Wang et al., CIKM 2017     |
+| MVURE  | Parcel         | Graph-based | MVURE     | Zhang et al., IJCAI 2020   |
+| ReMVC  | Parcel         | Token-based | ReMVC     | Zhang et al., 2022         |
+| HGI   | Parcel         | Graph-based | HGI      | Zhou et al., —             |
+| ReDCL   | Parcel         | Token-based | ReDCL      | Zhou et al., —             |
+| HREP   | Parcel         | Graph-based | HREP      | Zhou et al., —             |
+| HAFus| Parcel         | Graph-based | HAFusion      | Zhou et al., —             |
+
+
+
+
+### Provided Datasets
+
+| City | #POI | #Segment | #Parcel | Check-in #Traj | Check-in #User | Check-in Freq | GPS #Traj | GPS #User | GPS Freq | #OD |
+|------|------|----------|---------|----------------|----------------|---------------|-----------|-----------|---------|----|
+| NY   | 79,627 | 90,781 | 262     | 823,853        | 2,758          | 30            | X         | X         | X       | 28,189 |
+| CHI  | 28,141 | 47,669 | 77      | 279,183        | 921            | 57            | X         | X         | X       | 4,631 |
+| TYO  | 61,858 | 407,905 | 64     | 823,853        | 2,227          | 29            | X         | X         | X       | X |
+| SIN  | 75,329 | 35,084 | 332     | 827,828        | 3,489          | 49            | 226,782   | None      | 35      | 324 |
+| PRT  | 4,521  | 11,095 | 382     | 19,402         | 126            | 9             | 695,085   | 435       | 2,430   | 324 |
+| SF   | 15,674 | 27,274 | 194     | 171,873        | 361            | 23            | 500,516   | 405       | 771     | 24,716 |
+| BJ   | 81,181 | 40,306 | 11,208  | X              | X              | X             | 1,018,312 | 1,677     | 856     | 687,890 |
+| CD   | 17,301 | 6,195  | 1,306   | X              | X              | X             | 559,729   | 48,295    | 1,551   | 64,482 |
+| XA   | 19,108 | 5,269  | 1,056   | X              | X              | X             | 384,618   | 26,787    | 1,359   | 54,365 |
+
+
+
+
 ## 2. Quick Starting
 ### Step 1: Create a Python 3.9 environment and install dependencies:
 
@@ -44,6 +95,7 @@ MapRL models encodes various entities in a unified configuration, which facilita
 conda create -n VecCity python=3.9
 source activate VecCity
 ```
+
 
 ### Step 2: Install library:
 
