@@ -277,3 +277,10 @@ If you find our work is useful for your research, please consider citing:
   year={2024}
 }
 ```
+
+## Supporters
+[![Stargazers repo roster for @Bigscity-VecCity/VecCity](https://reporoster.com/stars/Bigscity-VecCity/VecCity)](https://github.com/Bigscity-VecCity/VecCity/stargazers)
+
+[![Forkers repo roster for @Bigscity-VecCity/VecCity](https://reporoster.com/forks/Bigscity-VecCity/VecCity)](https://github.com/Bigscity-VecCity/VecCity/network/members)
+
+```
