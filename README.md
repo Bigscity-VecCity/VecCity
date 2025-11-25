@@ -229,7 +229,7 @@ This script will run the CTLE model on the nyc dataset for downstream tasks of t
 The expected structure of files is:
 ```
 VecCity
- |-- VecCity  # UrbanKG_data
+ |-- VecCity 
  |    |-- cache
  |    |    |-- dataset_cache  # 中间文件
  |    |    |    |-- bj   
