@@ -270,11 +270,19 @@ VecCity
 ## 6 Citation
 If you find our work is useful for your research, please consider citing:
 ```bash
-@article{zhang2024vec,
-  title={VecCity: A Taxonomy-guided Library for Map Entity Representation Learning},
-  author={Zhang, Wentao and Wang, jingyuan and Yang, Yifan and U, Leonhou},
-  journal={arxiv},
-  year={2024}
+@article{10.14778/3742728.3742749,
+    author = {Zhang, Wentao and Wang, Jingyuan and Yang, Yifan and U, Leong Hou},
+    title = {VecCity: A Taxonomy-Guided Library for Map Entity Representation Learning},
+    year = {2025},
+    publisher = {VLDB Endowment},
+    volume = {18},
+    number = {8},
+    issn = {2150-8097},
+    doi = {10.14778/3742728.3742749},
+    journal = {Proceedings of the VLDB Endowment.},
+    month = apr,
+    pages = {2575–2588},
+    numpages = {14}
 }
 ```
 
